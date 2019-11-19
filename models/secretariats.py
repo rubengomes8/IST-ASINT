@@ -1,5 +1,6 @@
 class secretariats:
-    def __init__(self, s_id, name, campus, building, timetable,description):
+
+    def __init__(self, s_id, name, campus, building, timetable, description):
         self.name = name
         self.campus = campus
         self.building = building

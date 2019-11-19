@@ -1,42 +1,63 @@
-
-import models.secretariats
+import models.secretariats as sec
 import pickle
 
-class bookDB:
+'''
+Scretariats: id, name, building, campus, opening hours e description.
+endpoints:
+GET
+- "api/secreteriats/<id>" apresenta nome, campus, edificio, horário e descrição
+- "api/secreteriats/<id>/location" apresenta nome, campus e edificio
+- "api/secreteriats/<id>/description" apresenta nome e descrição
+- "api/secreteriats/<id>/hours" apresenta nome, horas
+POST
+- "api/secretariats/create" - cria secretaria
+- "api/secretariats/<id>/hours" - modificar as horas de abertura
+- "api/secretariats/<id>/description" - modificar descrição
+'''
+
+class secretariatsDB:
+
         def __init__(self, name):
                 self.name = name
                 try:
                         f = open('bd_dump'+name, 'rb')
-                        self.bib = pickle.load(f)
+                        self.secretariats = pickle.load(f)
                         f.close()
                 except IOError:
-                        self.bib = {}
-        def addBook(self, author, title, year):
-                b_id = len(self.bib)
-                self.bib[b_id] = book.book(author, title, year, b_id)
+                        self.secretariats = {}
+
+        # for GET Methods
+        def showSecretariat(self, _id):
+                return self.secretariats[_id]
+
+        def showLocation(self, _id):
+                return [self.secretariats[_id].campus, self.secretariats[_id].building]
+
+        def showDescription(self, _id):
+                return self.secretariats[_id].description
+
+        def showHours(self, _id):
+                return self.secretariats[_id].timetable
+
+        # for POST Methods
+        def addSecretariats(self, name, building, campus, hours, description):
+                s_id = len(self.secretariats)
+                self.secretariats[s_id] = sec.secretariats(name, campus, building, hours, description)
                 f = open('bd_dump'+self.name, 'wb')
-                pickle.dump(self.bib, f)
+                pickle.dump(self.secretariats, f)
                 f.close()
-        def showBook(self, b_id):
-                return self.bib[b_id]
 
-        def listAllBooks(self):
-                return list(self.bib.values())
+        def changeHours(self, hours, _id):
+                self.secretariats[_id].timetable = hours
 
-        def listBooksAuthor(self, authorName):
-                ret_value = []
-                for b in self.bib.values():
-                        if b.author == authorName:
-                                ret_value.append(b)
-                return ret_value
-        def listBooksYear(self, year):
-                ret_value = []
-                for b in self.bib.values():
-                        if b.year == year:
-                                ret_value.append( b)
-                return ret_value
-        def listAllAuthors(self):
-                set_authors = set()
-                for book in self.bib.values():
-                        set_authors.add(book.author)
-                return list(set_authors)
+        def changeDescription(self, description, _id):
+                self.secretariats[_id].description = description
+
+        def changeName(self, name, _id):
+                self.secretariats[_id].name = name
+
+
+
+
+
+
