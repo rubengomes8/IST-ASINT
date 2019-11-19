@@ -1,6 +1,6 @@
-import models
-import models.secretariats
 
+import models.secretariats
+import pickle
 
 class bookDB:
         def __init__(self, name):
