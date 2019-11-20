@@ -31,18 +31,18 @@ class secretariatsDB:
                 return self.secretariats[_id]
 
         def showLocation(self, _id):
-                return [self.secretariats[_id].campus, self.secretariats[_id].building]
+                return [self.secretariats[_id].name,self.secretariats[_id].campus, self.secretariats[_id].building]
 
         def showDescription(self, _id):
-                return self.secretariats[_id].description
+                return [self.secretariats[_id].name, self.secretariats[_id].description]
 
         def showHours(self, _id):
-                return self.secretariats[_id].timetable
+                return [self.secretariats[_id].name, self.secretariats[_id].timetable]
 
         # for POST Methods
         def addSecretariats(self, name, building, campus, hours, description):
                 s_id = len(self.secretariats)
-                self.secretariats[s_id] = sec.secretariats(name, campus, building, hours, description)
+                self.secretariats[s_id] = sec.secretariats(s_id,name, campus, building, hours, description)
                 f = open('bd_dump'+self.name, 'wb')
                 pickle.dump(self.secretariats, f)
                 f.close()
@@ -55,6 +55,9 @@ class secretariatsDB:
 
         def changeName(self, name, _id):
                 self.secretariats[_id].name = name
+
+        def listAllSecretariats(self):
+                return list(self.secretariats.values())
 
 
 
