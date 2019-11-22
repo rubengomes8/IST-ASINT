@@ -9,4 +9,7 @@ class secretariats:
         self.description=description
 
     def __str__(self):
-        return "%d - %s - %s - %s - %s - %s" % (self.id, self.name, self.campus, self.building, self.timetable, self.description)
+        return "%s" % (self.name)
+
+    #def __str__(self):
+        #return "%d - %s - %s - %s - %s - %s" % (self.id, self.name, self.campus, self.building, self.timetable, self.description)
