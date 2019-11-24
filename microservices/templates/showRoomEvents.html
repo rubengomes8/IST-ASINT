@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Events</title>
+</head>
+<body>
+    <h1>{{room['name']}} Timetable:</h1>
+
+    <ul>
+        Name:
+            <ul><li> {{room['name']}}</li></ul>
+        ID: 
+            <ul><li id="id">{{room['id']}}</li></ul>
+        Normal Capacity: 
+            <ul><li>  {{room['capacity']['normal']}}</li></ul>
+        Exam Capacity: 
+            <ul><li> {{room['capacity']['exam']}}</li></ul>
+       
+    </ul>
+
+    <h1>Timetable:</h1>   
+       
+    <ol>
+        {% for item in events %}
+       
+        <li
+            ><ul>Day:
+                    <ul><li> {{item['day']}}</li></ul>
+                Type:                
+                    <ul><li> {{item['type']}}</li></ul>
+                    <ul><li> {{item['info']}}</li></ul>
+                Start:
+                    <ul><li>  {{item['start']}}</li></ul>
+                End:
+                    <ul><li> {{item['end']}}</li></ul>
+                Class:{{item['course']}}
+                <ul><li>
+                       
+                </li></ul>
+
+
+                Description:
+                    <ul><li> {{item['description']}}</li></ul>
+                Title:
+                <ul><li> {{item['title']}}</li></ul>
+            </ul>
+
+        </li>
+        {% endfor %}
+    </ol>
+
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Room Location</title>
+</head>
+<body>
+<h1>Room Location:</h1>
+
+    <ul>
+        Name:
+            <ul><li> {{room['name']}}</li></ul>
+        ID: 
+            <ul><li id="id">{{room['id']}}</li></ul>
+        Normal Capacity: 
+            <ul><li>  {{room['capacity']['normal']}}</li></ul>
+        Exam Capacity: 
+            <ul><li> {{room['capacity']['exam']}}</li></ul>
+       
+    </ul>
+
+    <h2>Location:</h2>
+    <ul>
+        Building:
+            <ul><li> {{location['name']}}</li></ul>
+        Floor:
+            <ul><li> {{room['parentSpace']['name']}}</li></ul>
+        Campus: 
+            <ul><li>{{location['topLevelSpace']['name']}}</li></ul>       
+        
+    </ul>
+
+
+</body>
+</html>

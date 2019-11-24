@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+</head>
+<body>
+
+
+
+<h1>Rooms:</h1>
+
+<h2>Serch Place:</h2>
+
+<form action="/api/rooms/id" method="post">
+    ID:<input type="text" name="id"><br>  
+    <input type="submit">
+</form>
+
+<h1>Search Place</h1>
+
+<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false">
+    ID:<input type="text" id="q" name="f2">
+    <input type="submit" value="go">
+    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:5000/api/rooms/">
+</form>
+
+
+</body>
+</html>
