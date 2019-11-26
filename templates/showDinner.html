@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dinner</title>
+</head>
+<body>
+
+<h1>Dinner</h1>
+
+{% for item in list %}
+<p><b>{{item['menu']}}</b> ({{item['type']}}): {{item['name']}}</p>
+{% endfor %}
+
+</body>
+</html>

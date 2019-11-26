@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Today's Food</title>
+</head>
+<body>
+
+<h1>Lunch</h1>
+
+{% for item in list_lunch %}
+<p><b>{{item['menu']}}</b> ({{item['type']}}): {{item['name']}}</p>
+{% endfor %}
+
+<h1>Dinner</h1>
+
+{% for item in list_dinner %}
+<p><b>{{item['menu']}}</b> ({{item['type']}}): {{item['name']}}</p>
+{% endfor %}
+
+
+</body>
+</html>

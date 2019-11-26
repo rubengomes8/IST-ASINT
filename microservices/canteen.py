@@ -5,8 +5,7 @@ from flask import request
 import requests
 '''
 endpoints:
-- "api/canteen" apresenta menu de opções do microserviço cantina
-- "api/canteen/week" apresenta infromação para a semana
+- "api/canteen/" apresenta infromação para a semana
 - "api/canteen/day" escolher o dia da semana
 - "api/canteen/<ddmmyyyy>" apresenta informação para um dia almoço e jantar
 - "api/canteen/<ddmmyyyy>/lunch"  apresenta informação para o almoço de um dia
@@ -15,34 +14,66 @@ endpoints:
 
 app = Flask(__name__)
 
-@app.route('/api/canteen')
+@app.route('/api/canteen', methods=['GET'])
 def canteen_menu():
-    return render_template("canteenMenu.html")
+    url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
 
-@app.route('/api/canteen/week', methods=['GET'])
-def week_info():
-    if request.method == "GET":
-        url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen/'
-        r = requests.get(url=url)
-        data = r.json()
-        print(data)
-        days = []
-        _meals = {}
-        for day in data:
-            days.append(day['day'])
-            for meals in day['meal']['info']:
-                type1 = day['meal']['type']
-                for meal in meals:
-                    meals[type1] = [meal['type'], meal['name']]
+@app.route('/api/canteen/<day>', methods=['GET'])
+def canteen_day(day): # day must be in format ddmmyyyy
+    url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
+    _day = day[0:2]
+    _month = day[2:4]
+    _year = day[4:8]
+    r = requests.get(url=url)
+    data = r.json()
+    for item in data:
+        if item['day'] == _day+'/'+_month+'/'+_year:
+            print(_day+'/'+_month+'/'+_year)
+            return jsonify(item)
+    error = {}
+    error['error'] = 404
+    return jsonify(error)
 
-        print(days)
-        print(_meals)
-        
-    return render_template("weeklyCanteenInfo.html")
+@app.route('/api/canteen/<day>/lunch', methods=['GET'])
+def canteen_day_lunch(day): # day must be in format ddmmyyyy
+    url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
+    _day = day[0:2]
+    _month = day[2:4]
+    _year = day[4:8]
+    r = requests.get(url=url)
+    data = r.json()
+    for item in data:
+        if item['day'] == _day+'/'+_month+'/'+_year:
+            print(_day+'/'+_month+'/'+_year)
+            meal = item['meal']
+            for _meal in meal:
+                if _meal['type'] == 'Almoço':
+                    return jsonify(_meal['info'])
+    error = {}
+    error['error'] = 404
+    return jsonify(error)
 
-@app.route('/api/canteen/day')
-def choose_day():
-    return render_template("chooseDayCanteen.html")
+@app.route('/api/canteen/<day>/dinner', methods=['GET'])
+def canteen_day_dinner(day): # day must be in format ddmmyyyy
+    url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
+    _day = day[0:2]
+    _month = day[2:4]
+    _year = day[4:8]
+    r = requests.get(url=url)
+    data = r.json()
+    for item in data:
+        if item['day'] == _day+'/'+_month+'/'+_year:
+            print(_day+'/'+_month+'/'+_year)
+            meal = item['meal']
+            for _meal in meal:
+                if _meal['type'] == 'Jantar':
+                    return jsonify(_meal['info'])
+    error = {}
+    error['error'] = 404
+    return jsonify(error)
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=4001)

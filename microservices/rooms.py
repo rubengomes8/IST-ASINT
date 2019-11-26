@@ -75,4 +75,4 @@ def show_events(_id):
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=4002)

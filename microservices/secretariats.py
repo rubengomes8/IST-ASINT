@@ -27,7 +27,7 @@ def hello_world():
     count = len(db.listAllSecretariats())
     return render_template("secretariatsMenu.html", count=count)'''
     
-@app.route('/api/secretariats/')
+@app.route('/api/secretariats/', methods=['GET'])
 def list_all_Secretariats():
     list_secs = db.listAllSecretariats()
     print(list_secs)
@@ -44,11 +44,11 @@ def create_sec_form():
 @app.route('/api/secretariats/addSecretariat', methods=['POST'])
 def add_secretariat():   
     if request.method == "POST":
-        name = str(request.form['Name'])
-        campus =str(request.form['Campus'])
-        building=str(request.form['Building'])
-        hours=str(request.form['Hours'])
-        description=str(request.form['Description'])
+        name = str(request.form['name'])
+        campus =str(request.form['campus'])
+        building=str(request.form['building'])
+        hours=str(request.form['hours'])
+        description=str(request.form['description'])
         sec = db.addSecretariats(name, building, campus, hours, description)
     return jsonify(sec.__dict__)
 
@@ -58,7 +58,7 @@ def single_secretariat(_id):
         sec = db.showSecretariat(int(_id)) 
         if sec==-1:
             dict_={}
-            dict_['error']=1
+            dict_['error']=404
             return jsonify(dict_)   
              
     return jsonify(sec.__dict__)
@@ -69,7 +69,7 @@ def secretariat_location(_id):
         sec=db.showLocation(int( _id))
         if sec==-1:
             dict_={}
-            dict_['error']=1
+            dict_['error']=404
             return jsonify(dict_)   
     return jsonify(sec)
 
@@ -79,7 +79,7 @@ def secretariat_description(_id):
         sec=db.showDescription(int( _id))
         if sec==-1:
             dict_={}
-            dict_['error']=1
+            dict_['error']=404
             return jsonify(dict_)   
     return jsonify(sec)
 
@@ -89,7 +89,7 @@ def secretariat_timetable(_id):
         sec=db.showHours(int( _id))
         if sec==-1:
             dict_={}
-            dict_['error']=1
+            dict_['error']=404
             return jsonify(dict_)   
     return jsonify(sec)
 

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Choose Day</title>
+</head>
+<body>
+
+<h1>Choose a Day</h1>
+
+<form action="/" method="post">
+    Day(ddmmyyyy):          <input type="text" name="day" id="day"><br>
+</form>
+
+<form>
+    <input type="submit" value="lunch" action="/canteen/DAY/lunch" method="get">
+</form>
+
+<form>
+    <input type="submit" value="dinner" action="/canteen/DAY/dinner" method="get">
+</form>
+
+<form>
+    <input type="submit" value="both" action="/canteen/DAY" method="get">
+</form>
+
+</body>
+</html>
