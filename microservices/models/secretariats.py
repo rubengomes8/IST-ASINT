@@ -13,3 +13,5 @@ class secretariats:
 
     #def __str__(self):
         #return "%d - %s - %s - %s - %s - %s" % (self.id, self.name, self.campus, self.building, self.timetable, self.description)
+
+    

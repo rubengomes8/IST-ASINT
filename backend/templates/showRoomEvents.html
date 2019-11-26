@@ -34,16 +34,22 @@
                     <ul><li>  {{item['start']}}</li></ul>
                 End:
                     <ul><li> {{item['end']}}</li></ul>
-                Class:{{item['course']}}
+                Class:
                 <ul><li>
+                        {% if 'course' in item %}
+                            {{item['course']['acronym']}}- {{item['course']['name']}}
+                        {% endif %} 
                        
                 </li></ul>
 
-
-                Description:
+                {% if 'description' in item %}
+                      Description:
                     <ul><li> {{item['description']}}</li></ul>
-                Title:
-                <ul><li> {{item['title']}}</li></ul>
+                {% endif %} 
+                {% if 'title' in item %}
+                    Title:
+                    <ul><li> {{item['title']}}</li></ul>
+                {% endif %}
             </ul>
 
         </li>

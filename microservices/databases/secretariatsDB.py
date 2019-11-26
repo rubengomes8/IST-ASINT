@@ -28,17 +28,35 @@ class secretariatsDB:
 
         # for GET Methods
         def showSecretariat(self, _id):
+                if _id > len(self.secretariats) - 1 or _id <= -1:
+                       return -1
                 return self.secretariats[_id]
 
         def showLocation(self, _id):
-                return [self.secretariats[_id].name,self.secretariats[_id].campus, self.secretariats[_id].building]
+                if _id > len(self.secretariats) - 1 or _id <= -1:
+                       return -1
+                dict_ = {}
+                dict_['name'] = self.secretariats[_id].name
+                dict_['campus'] = self.secretariats[_id].campus
+                dict_['building'] = self.secretariats[_id].building
+                return dict_
 
         def showDescription(self, _id):
-                return [self.secretariats[_id].name, self.secretariats[_id].description]
+                if _id > len(self.secretariats) - 1 or _id <= -1:
+                       return -1
+                dict_ = {}
+                dict_['name'] = self.secretariats[_id].name
+                dict_['description'] = self.secretariats[_id].description                
+                return dict_
+              
 
         def showHours(self, _id):
-                return [self.secretariats[_id].name, self.secretariats[_id].timetable]
-
+                if _id > len(self.secretariats) - 1 or _id <= -1:
+                       return -1
+                dict_ = {}
+                dict_['name'] = self.secretariats[_id].name
+                dict_['timetable'] = self.secretariats[_id].timetable                
+                return dict_
         # for POST Methods
         def addSecretariats(self, name, building, campus, hours, description):
                 s_id = len(self.secretariats)
@@ -46,6 +64,7 @@ class secretariatsDB:
                 f = open('bd_dump'+self.name, 'wb')
                 pickle.dump(self.secretariats, f)
                 f.close()
+                return self.secretariats[s_id]
 
         def changeHours(self, hours, _id):
                 self.secretariats[_id].timetable = hours

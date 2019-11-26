@@ -63,10 +63,13 @@ def show_events(_id):
         data=r.json()
         
         events=data['events']
-        print(events)
+        #print(events)
 
         events.sort(key = lambda x:(x['day'], x['period']['start']))
         
+        for item in events:
+            
+            print(item['type'])
        
     return render_template("showRoomEvents.html", room=r.json(), events=events)
 
