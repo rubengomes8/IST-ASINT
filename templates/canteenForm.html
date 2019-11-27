@@ -8,14 +8,86 @@
 
 <h1>Choose a Day</h1>
 
-<form action="/" method="post">
-    Day(ddmmyyyy):          <input type="text" name="day" id="day"><br>
-</form>
+<button onclick="lunch()">Lunch</button>
+<button onclick="dinner()">Dinner</button>
+<button onclick="both()">Both</button>
 
-<form>
-    <input type="submit" value="lunch" action="/canteen/DAY/lunch" method="get">
-</form>
 
+<div id="lunch_form" style="display:none;">
+    <h3>Lunch:</h3>
+    <form action="#"  onsubmit="location.href = document.getElementById('location_l').value +   document.getElementById('daylunch').value + '/lunch' ;return false;" >
+        Day(ddmmyyyy): <input type="text" name="day" id="daylunch"><br>     
+        <input type=submit id=l value="Go" name="/lunch">  
+        <input type=hidden id=location_l name=f1 value="http://127.0.0.1:3998/canteen/">
+        
+    </form>
+</div>
+
+<div id="dinner_form" style="display:none;">
+        <h3>Dinner:</h3>
+        <form action="#"  onsubmit="location.href = document.getElementById('location_d').value +   document.getElementById('daydinner').value + '/dinner' ;return false;" >
+            Day(ddmmyyyy): <input type="text" name="day" id="daydinner"><br>     
+            <input type=submit id=d value="Go" name="/lunch">  
+            <input type=hidden id=location_d name=f1 value="http://127.0.0.1:3998/canteen/">            
+        </form>
+</div>
+    
+<div id="both_form" style="display:none;">
+        <h3>Both:</h3>
+        <form action="#"  onsubmit="location.href = document.getElementById('location_b').value +   document.getElementById('dayboth').value  ;return false;" >
+            Day(ddmmyyyy): <input type="text" name="day" id="dayboth"><br>     
+            <input type=submit id=d value="Go" name="/lunch">  
+            <input type=hidden id=location_b name=f1 value="http://127.0.0.1:3998/canteen/">            
+        </form>
+</div>
+
+<script>
+    function lunch() {
+        var x = document.getElementById("lunch_form");
+        var y = document.getElementById("dinner_form");
+        var z = document.getElementById("both_form");
+        y.style.display = "none"
+        z.style.display = "none"
+
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function dinner() {
+        var x = document.getElementById("dinner_form");
+        var y = document.getElementById("lunch_form");
+        var z = document.getElementById("both_form");
+        y.style.display = "none"
+        z.style.display = "none"
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function both() {
+        var x = document.getElementById("both_form");
+        var y = document.getElementById("dinner_form");
+        var z = document.getElementById("lunch_form");
+        y.style.display = "none"
+        z.style.display = "none"
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+    function myFunction(){
+        if (document.getElementById("lunch").checked == true)                 
+            location.href = document.getElementById('location_l').value +   document.getElementById('day').value;
+    }
+</script>
+<!--
 <form>
     <input type="submit" value="dinner" action="/canteen/DAY/dinner" method="get">
 </form>
@@ -24,5 +96,11 @@
     <input type="submit" value="both" action="/canteen/DAY" method="get">
 </form>
 
+<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('id').innerHTML + document.getElementById('f2').value ; return false">       
+    <input type="submit" value="Location">    
+    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:5000/api/rooms/">
+    <input type=hidden id=f2 name=f1 value="/location">
+</form>
+-->
 </body>
 </html>
