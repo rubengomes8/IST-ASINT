@@ -14,20 +14,23 @@ from flask import render_template
 from flask import request
 import requests
 import datetime
-app = Flask(__name__)
 
+app = Flask(__name__)
+log_path = './log.txt'
 
 
 @app.route('/api/rooms')
-def hello_world():    
+def api_rooms():
+    add_log('Microservices', 'rooms', 'GET ....')
     url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'
     r = requests.get(url=url)
     data = r.json()
     return jsonify(data)
 
 @app.route('/api/rooms/<_id>', methods=['GET'])
-def search(_id): 
-    if request.method == "GET":        
+def search(_id):
+    add_log('Microservices', 'rooms', 'GET ....')
+    if request.method == "GET":
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         r = requests.get(url = url)
         data=r.json()        
@@ -50,8 +53,9 @@ def search(_id):
 
 
 @app.route('/api/rooms/<_id>/location', methods=['GET'])
-def show_location(_id): 
-    if request.method == "GET":        
+def show_location(_id):
+    add_log('Microservices', 'rooms', 'GET ....')
+    if request.method == "GET":
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         r = requests.get(url = url)
         data=r.json()
@@ -96,8 +100,9 @@ def show_location(_id):
     return jsonify(room)
 
 @app.route('/api/rooms/<_id>/events', methods=['GET'])
-def show_events(_id): 
-    if request.method == "GET":        
+def show_events(_id):
+    add_log('Microservices', 'rooms', 'GET ....')
+    if request.method == "GET":
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         date=datetime.datetime.today()
         today=str(date.day)+"/"+str(date.month)+"/"+str(date.year)
@@ -126,7 +131,8 @@ def show_events(_id):
                 return jsonify(error)
 
 @app.route('/api/rooms/<_id>/events/<day>', methods=['GET'])
-def show_date_events(_id, day): 
+def show_date_events(_id, day):
+    add_log('Microservices', 'rooms', 'GET ....')
     if request.method == "GET": 
         _day = day[0:2]
         _month = day[2:4]
@@ -163,5 +169,12 @@ def show_date_events(_id, day):
                 error = {}
                 error['error'] = 404
                 return jsonify(error)
+
+def add_log(type = 'empty', module = 'empty', info = 'empty'):
+    global log_path
+    f = open(log_path, 'a')
+    f.write('Type: ' + type + ' Module: ' + module + ' Info: ' + info + '\n')
+    f.close()
+
 if __name__ == '__main__':
     app.run(port=4002)
