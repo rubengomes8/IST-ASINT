@@ -10,6 +10,9 @@ port_sec = '4000'
 port_canteen = '4001'
 port_rooms = '4002'
 
+port_api='3999'
+port_webpages='3998'
+
 @app.route('/', methods=['GET'])
 def initial_menu():
     return render_template("mainPage.html")
@@ -112,6 +115,57 @@ def canteen_dinner(day):
     data = r.json()
     return render_template("showDinner.html", list=data)
     #return jsonify(data)
+
+#Rooms
+
+@app.route('/rooms', methods=['GET'])
+def rooms_menu():
+    return render_template("roomsMenu.html", port_webpages=port_webpages)
+
+@app.route('/rooms/<_id>', methods=['GET'])
+def room(_id):
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
+    print(url)
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoom.html", room=data,  port_webpages=port_webpages)
+    
+        
+@app.route('/rooms/<_id>/location', methods=['GET'])
+def room_location(_id):
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/location'
+    print(url)
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomLocation.html", room=data,  port_webpages=port_webpages)
+
+@app.route('/rooms/<_id>/events', methods=['GET'])
+def room_events(_id):
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events'
+    print(url)
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
+
+@app.route('/rooms/<_id>/events/<day>', methods=['GET'])
+def room_events_day(_id,day):
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events/'+day
+    print(url)
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
 
 if __name__ == '__main__':
     app.run(port=3998)

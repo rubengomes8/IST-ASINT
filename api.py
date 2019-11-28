@@ -77,8 +77,44 @@ def canteen_day_dinner(day):
     data = r.json()
     return jsonify(data)
 
+
+
 # SALAS
 
+@app.route('/api/room', methods=['GET'])
+def room():
+    url = 'http://127.0.0.1:'+port_rooms+'/api/rooms'
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
+
+@app.route('/api/room/<_id>')
+def room_info(_id):
+    url = 'http://127.0.0.1:'+port_rooms+'/api/rooms/'+_id
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
+
+@app.route('/api/room/<_id>/location')
+def room_location(_id):
+    url = 'http://127.0.0.1:'+port_rooms+'/api/rooms/'+_id+'/location'
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
+
+@app.route('/api/room/<_id>/events')
+def room_events(_id):
+    url = 'http://127.0.0.1:'+port_rooms+'/api/rooms/'+_id+'/events'
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
+
+@app.route('/api/room/<_id>/events/<day>')
+def room_day_events(_id, day):
+    url = 'http://127.0.0.1:'+port_rooms+'/api/rooms/'+_id+'/events/'+day
+    r = requests.get(url=url)
+    data = r.json()
+    return jsonify(data)
 
 
 if __name__ == '__main__':
