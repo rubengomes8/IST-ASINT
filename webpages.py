@@ -3,6 +3,7 @@ from flask import render_template
 from flask import jsonify
 import requests
 from flask import request
+import auth
 
 app = Flask(__name__)
 
@@ -10,10 +11,27 @@ port_api='3999'
 port_webpages='3998'
 log_path='./log.txt'
 
+
+
 @app.route('/', methods=['GET'])
 def initial_menu():
+    auth.request_user_permission()
     add_log('Backend', 'Web Pages', 'GET mainPage.html')
     return render_template("mainPage.html")
+
+@app.route('/redirect', methods=['GET'])
+def get_code():
+    global access_token
+    global refresh_token
+    global expires_in
+    code = request.args.get('code')
+    print(code)
+    data = auth.request_access_token(code)
+    access_token = data['access_token']
+    refresh_token = data['refresh_token']
+    expires_in = data['expires_in']
+    print(data)
+    return jsonify(data)
 
 # SECRETARIA
 
