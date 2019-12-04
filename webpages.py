@@ -5,12 +5,14 @@ from flask import redirect
 import requests
 from flask import request
 import auth
+import datetime
 
 app = Flask(__name__)
 
 port_api='3999'
 port_webpages='3998'
 log_path='./log.txt'
+port_log='4003'
 
 redirect_uri = "http://127.0.0.1:3998/userAuth" # this is the address of the page on this app
 client_id= "1695915081465934" # copy value from the app registration
@@ -106,61 +108,69 @@ def get_code():
 
 @app.route('/secretariats', methods=['GET'])
 def secretariats_menu():
-    add_log('Backend', 'Web Pages', 'GET secretariatsMenu.html')
-    return render_template("secretariatsMenu.html")
+   if request.method=='GET':
+        send_log('backend: webpages, render secretariats options, GET')
+        return render_template("secretariatsMenu.html")
 
 @app.route('/secretariats/all', methods=['GET'])
 def all_secretariats():
-    add_log('Backend', 'Web Pages', 'GET allSecretariats.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
-    print(url)
-    r = requests.get(url=url)
-    return render_template("allSecretariats.html", list_secs=r.json())
+    if request.method == 'GET':
+        send_log('backend: webpages, render all secretariats, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
+        print(url)
+        r = requests.get(url=url)
+        return render_template("allSecretariats.html", list_secs=r.json())
 
 @app.route('/secretariats/<_id>', methods=['GET'])
 def secretariat(_id):
-    add_log('Backend', 'Web Pages', 'GET showSecretariat.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
-    print(url)
-    r = requests.get(url=url)
-    return render_template("showSecretariat.html", sec_dict=r.json())
+    if request.method == 'GET':
+        send_log('backend: webpages, render secretariat by id, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
+        print(url)
+        r = requests.get(url=url)
+        return render_template("showSecretariat.html", sec_dict=r.json())
 
 @app.route('/secretariats/<_id>/location', methods=['GET'])
 def secretariat_local(_id):
-    add_log('Backend', 'Web Pages', 'GET showSecretariatLocation.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
-    print(url)
-    r = requests.get(url=url)
-    print(r.json())
-    return render_template("showSecretariatLocation.html", sec=r.json())
+    if request.method == 'GET':
+        send_log('backend: webpages, render secretariat location, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
+        print(url)
+        r = requests.get(url=url)
+        print(r.json())
+        return render_template("showSecretariatLocation.html", sec=r.json())
 
 @app.route('/secretariats/<_id>/timetable', methods=['GET'])
 def secretariat_timetable(_id):
-    add_log('Backend', 'Web Pages', 'GET showSecretariatTimetable.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
-    print(url)
-    r = requests.get(url=url)
-    print(r.json())
-    return render_template("showSecretariatTimetable.html", sec=r.json())
+    if request.method == 'GET':
+        send_log('backend: webpages, render secretariat timetable, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
+        print(url)
+        r = requests.get(url=url)
+        print(r.json())
+        return render_template("showSecretariatTimetable.html", sec=r.json())
 
 @app.route('/secretariats/<_id>/description', methods=['GET'])
 def secretariat_desc(_id):
-    add_log('Backend', 'Web Pages', 'GET showSecretariatDescription.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
-    print(url)
-    r = requests.get(url=url)
-    print(r.json())
-    return render_template("showSecretariatDescription.html", sec=r.json())
+    if request.method  == 'GET':
+        send_log('backend: webpages, render secretariat description, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
+        print(url)
+        r = requests.get(url=url)
+        print(r.json())
+        return render_template("showSecretariatDescription.html", sec=r.json())
 
-@app.route('/secretariats/create')
+@app.route('/secretariats/create',methods=['GET'])
 def create_sec_form():
-    add_log('Backend', 'Web Pages', 'GET addSecretariatForm.html')
-    return render_template("addSecretariatForm.html")
+    if request.method  == 'GET':
+        send_log('backend: webpages, render add secretariat form, GET')
+        return render_template("addSecretariatForm.html")
 
 @app.route('/secretariats/addSecretariat', methods=['POST'])
 def add_secretariat():
-    add_log('Backend', 'Web Pages', 'POST addSecretariat')
+    
     if request.method == "POST":
+        send_log('backend: webpages,  add secretariat, POST')
         url = 'http://127.0.0.1:' + port_api + '/api/secretariats/addSecretariat'
         data = {
             'name': str(request.form['Name']),
@@ -176,103 +186,122 @@ def add_secretariat():
 
 @app.route('/canteen', methods=['GET'])
 def canteen():
-    add_log('Backend', 'Web Pages', 'GET canteenForm.html')
+    send_log('backend: webpages, render canteen form, GET')
     return render_template('canteenForm.html')
 
 
 @app.route('/canteen/<day>', methods=['GET'])
 def canteen_day(day):
-    add_log('Backend', 'Web Pages', 'GET showLunchDinner.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
-    print(url)
-    r = requests.get(url=url)
-    lunch = r.json()
-    url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
-    print(url)
-    r = requests.get(url=url)
-    dinner = r.json()
-    return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
-    return jsonify(data)
+    if request.method=='GET':
+        send_log('backend: webpages, render canteen lunch and dinner, GET')
+        url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
+        print(url)
+        r = requests.get(url=url)
+        lunch = r.json()
+        url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
+        print(url)
+        r = requests.get(url=url)
+        dinner = r.json()
+        return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
+        return jsonify(data)
 
 @app.route('/canteen/<day>/lunch', methods=['GET'])
 def canteen_lunch(day):
-    add_log('Backend', 'Web Pages', 'GET showLunch.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    return render_template("showLunch.html", list=data)
+    if request.method=='GET':
+        send_log('backend: webpages, render canteen lunch, GET')
+        add_log('Backend', 'Web Pages', 'GET showLunch.html')
+        url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        return render_template("showLunch.html", list=data)
 
 @app.route('/canteen/<day>/dinner', methods=['GET'])
 def canteen_dinner(day):
-    add_log('Backend', 'Web Pages', 'GET showDinner.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    return render_template("showDinner.html", list=data)
+    if request.method=='GET':
+        send_log('backend: webpages, render canteen dinner, GET')
+        add_log('Backend', 'Web Pages', 'GET showDinner.html')
+        url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        return render_template("showDinner.html", list=data)
     #return jsonify(data)
 
 #Rooms
 
 @app.route('/rooms', methods=['GET'])
 def rooms_menu():
-    add_log('Backend', 'Web Pages', 'GET roomsMenu.html')
-    return render_template("roomsMenu.html", port_webpages=port_webpages)
+    if request.method=='GET':
+        send_log('backend: webpages, render rooms form, GET')        
+        return render_template("roomsMenu.html", port_webpages=port_webpages)
 
 @app.route('/rooms/<_id>', methods=['GET'])
 def room(_id):
-    add_log('Backend', 'Web Pages', 'GET showRoom.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    if 'error' in data.keys():
-        return jsonify(data)
-    else:
-        return render_template("showRoom.html", room=data,  port_webpages=port_webpages)
+     if request.method=='GET':
+        send_log('backend: webpages, render room by id, GET') 
+       
+        url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        if 'error' in data.keys():
+            return jsonify(data)
+        else:
+            return render_template("showRoom.html", room=data,  port_webpages=port_webpages)
     
         
 @app.route('/rooms/<_id>/location', methods=['GET'])
 def room_location(_id):
-    add_log('Backend', 'Web Pages', 'GET showRoomLocation.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/location'
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    if 'error' in data.keys():
-        return jsonify(data)
-    else:
-        return render_template("showRoomLocation.html", room=data,  port_webpages=port_webpages)
+     if request.method=='GET':
+        send_log('backend: webpages, render room location, GET') 
+       
+        url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/location'
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        if 'error' in data.keys():
+            return jsonify(data)
+        else:
+            return render_template("showRoomLocation.html", room=data,  port_webpages=port_webpages)
 
 @app.route('/rooms/<_id>/events', methods=['GET'])
 def room_events(_id):
-    add_log('Backend', 'Web Pages', 'GET showRoomEvents.html')
-    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events'
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    if 'error' in data.keys():
-        return jsonify(data)
-    else:
-        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
+     if request.method=='GET':
+        send_log('backend: webpages, render room events, GET') 
+        url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events'
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        if 'error' in data.keys():
+            return jsonify(data)
+        else:
+            return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
 
 @app.route('/rooms/<_id>/events/<day>', methods=['GET'])
 def room_events_day(_id,day):
-    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events/'+day
-    print(url)
-    r = requests.get(url=url)
-    data = r.json()
-    if 'error' in data.keys():
-        return jsonify(data)
-    else:
-        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
+     if request.method=='GET':
+        send_log('backend: webpages, render room events by day, GET') 
+        url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events/'+day
+        print(url)
+        r = requests.get(url=url)
+        data = r.json()
+        if 'error' in data.keys():
+            return jsonify(data)
+        else:
+            return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
 
 def add_log(type = 'empty', module = 'empty', info = 'empty'):
     global log_path
     f = open(log_path, 'a')
     f.write('Type: ' + type + ' Module: ' + module + ' Info: ' + info + '\n')
     f.close()
+
+
+def send_log(msg):
+    url = 'http://127.0.0.1:'+port_log+'/addlog'
+    date = datetime.datetime.now()
+    requests.post(url=url, data={'log': str(date) + ' - ' + msg})
 
 if __name__ == '__main__':
     app.run(port=3998)

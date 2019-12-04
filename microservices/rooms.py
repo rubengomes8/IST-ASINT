@@ -18,19 +18,22 @@ import datetime
 app = Flask(__name__)
 log_path = './log.txt'
 
+port_log='4003'
 
-@app.route('/api/rooms')
+@app.route('/api/rooms', methods=['GET'])
 def api_rooms():
-    add_log('Microservices', 'rooms', 'GET ....')
-    url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'
-    r = requests.get(url=url)
-    data = r.json()
-    return jsonify(data)
+    if request.method=='GET':
+        send_log('microservice: rooms, get rooms, GET')
+        url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'
+        r = requests.get(url=url)
+        data = r.json()
+        return jsonify(data)
 
 @app.route('/api/rooms/<_id>', methods=['GET'])
 def search(_id):
-    add_log('Microservices', 'rooms', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: rooms, get room by id, GET')
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         r = requests.get(url = url)
         data=r.json()        
@@ -54,8 +57,9 @@ def search(_id):
 
 @app.route('/api/rooms/<_id>/location', methods=['GET'])
 def show_location(_id):
-    add_log('Microservices', 'rooms', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: rooms, get room location, GET')
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         r = requests.get(url = url)
         data=r.json()
@@ -101,8 +105,9 @@ def show_location(_id):
 
 @app.route('/api/rooms/<_id>/events', methods=['GET'])
 def show_events(_id):
-    add_log('Microservices', 'rooms', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: rooms, get room events, GET')
         url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+_id
         date=datetime.datetime.today()
         today=str(date.day)+"/"+str(date.month)+"/"+str(date.year)
@@ -132,8 +137,9 @@ def show_events(_id):
 
 @app.route('/api/rooms/<_id>/events/<day>', methods=['GET'])
 def show_date_events(_id, day):
-    add_log('Microservices', 'rooms', 'GET ....')
+    
     if request.method == "GET": 
+        send_log('microservice: rooms, get room events by day, GET')
         _day = day[0:2]
         _month = day[2:4]
         _year = day[4:8]       
@@ -175,6 +181,11 @@ def add_log(type = 'empty', module = 'empty', info = 'empty'):
     f = open(log_path, 'a')
     f.write('Type: ' + type + ' Module: ' + module + ' Info: ' + info + '\n')
     f.close()
+
+def send_log(msg):
+    url = 'http://127.0.0.1:'+port_log+'/addlog'
+    date = datetime.datetime.now()
+    requests.post(url=url, data={'log': str(date) + ' - ' + msg})
 
 if __name__ == '__main__':
     app.run(port=4002)

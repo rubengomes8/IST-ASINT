@@ -4,6 +4,9 @@ from flask import render_template
 from flask import request
 import databases.secretariatsDB as secdb
 
+import requests
+import datetime
+
 '''
 Scretariats: id, name, building, campus, opening hours e description.
 endpoints:
@@ -21,7 +24,9 @@ POST
 
 app = Flask(__name__)
 db = secdb.secretariatsDB("secretariats")
-log_path = './log.txt'
+
+port_log='4003'
+
 '''
 @app.route('/api/secretariats')
 def hello_world():
@@ -30,24 +35,26 @@ def hello_world():
     
 @app.route('/api/secretariats/', methods=['GET'])
 def list_all_Secretariats():
-    add_log('Microservices', 'secretariats', 'GET ....')
-    list_secs = db.listAllSecretariats()
-    print(list_secs)
-    list_of_dicts = []
-    for item in list_secs:
-        list_of_dicts.append(item.__dict__)
-    return jsonify(list_of_dicts)
+    if request.method == "GET":
+        send_log('microservice: secretariats, list all secretariats, GET')
+        list_secs = db.listAllSecretariats()
+        print(list_secs)
+        list_of_dicts = []
+        for item in list_secs:
+            list_of_dicts.append(item.__dict__)
+        return jsonify(list_of_dicts)
 
 ##usar apenas no backend
 @app.route('/api/secretariats/create')
 def create_sec_form():
-    add_log('Microservices', 'secretariats', 'GET ....')
+    if request.method == "GET":
+        send_log('microservice: secretariats, show form to create secretariat, GET')
     return render_template("addSecretariatForm.html")
 
 @app.route('/api/secretariats/addSecretariat', methods=['POST'])
 def add_secretariat():
-    add_log('Microservices', 'secretariats', 'GET ....')
     if request.method == "POST":
+        send_log('microservice: secretariats, create secretariat, POST')
         name = str(request.form['name'])
         campus =str(request.form['campus'])
         building=str(request.form['building'])
@@ -58,8 +65,8 @@ def add_secretariat():
 
 @app.route('/api/secretariats/<_id>', methods=['GET'])
 def single_secretariat(_id):
-    add_log('Microservices', 'secretariats', 'GET ....')
     if request.method == "GET":
+        send_log('microservice: secretariats, show secretariat by id, GET')
         sec = db.showSecretariat(int(_id)) 
         if sec==-1:
             dict_={}
@@ -70,8 +77,9 @@ def single_secretariat(_id):
 
 @app.route('/api/secretariats/<_id>/location', methods=['GET'])
 def secretariat_location(_id):
-    add_log('Microservices', 'secretariats', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: secretariats, show secretariat location, GET')
         sec=db.showLocation(int( _id))
         if sec==-1:
             dict_={}
@@ -81,8 +89,9 @@ def secretariat_location(_id):
 
 @app.route('/api/secretariats/<_id>/description', methods=['GET'])
 def secretariat_description(_id):
-    add_log('Microservices', 'secretariats', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: secretariats, show secretariat description, GET')
         sec=db.showDescription(int( _id))
         if sec==-1:
             dict_={}
@@ -92,8 +101,9 @@ def secretariat_description(_id):
 
 @app.route('/api/secretariats/<_id>/timetable', methods=['GET'])
 def secretariat_timetable(_id):
-    add_log('Microservices', 'secretariats', 'GET ....')
+    
     if request.method == "GET":
+        send_log('microservice: secretariats, show secretariat timetable, GET')
         sec=db.showHours(int( _id))
         if sec==-1:
             dict_={}
@@ -101,12 +111,13 @@ def secretariat_timetable(_id):
             return jsonify(dict_)   
     return jsonify(sec)
 
-def add_log(type = 'empty', module = 'empty', info = 'empty'):
-    global log_path
-    f = open(log_path, 'a')
-    f.write('Type: ' + type + ' Module: ' + module + ' Info: ' + info + '\n')
-    f.close()
 
+
+
+def send_log(msg):
+    url = 'http://127.0.0.1:'+port_log+'/addlog'
+    date = datetime.datetime.now()
+    requests.post(url=url, data={'log': str(date) + ' - ' + msg})
 
 if __name__ == '__main__':
     app.run(port=4000)
