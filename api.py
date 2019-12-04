@@ -62,25 +62,29 @@ def canteen():
     data = r.json()
     return jsonify(data)
 
-@app.route('/api/canteen/<day>', methods=['GET'])
-def canteen_day(day):
+@app.route('/api/canteen/<_day>', methods=['GET'])
+def canteen_day(_day):
     add_log('Backend', 'api', 'GET')
+    day = process_day(_day)
     url = 'http://127.0.0.1:'+port_canteen+'/api/canteen/'+day
     r = requests.get(url=url)
     data = r.json()
     return jsonify(data)
 
-@app.route('/api/canteen/<day>/lunch', methods=['GET'])
-def canteen_day_lunch(day):
+@app.route('/api/canteen/<_day>/lunch', methods=['GET'])
+def canteen_day_lunch(_day):
     add_log('Backend', 'api', 'GET')
+    day = process_day(_day)
+    print(day)
     url = 'http://127.0.0.1:'+port_canteen+'/api/canteen/'+day+'/lunch'
     r = requests.get(url=url)
     data = r.json()
     return jsonify(data)
 
-@app.route('/api/canteen/<day>/dinner', methods=['GET'])
-def canteen_day_dinner(day):
+@app.route('/api/canteen/<_day>/dinner', methods=['GET'])
+def canteen_day_dinner(_day):
     add_log('Backend', 'api', 'GET')
+    day = process_day(_day)
     url = 'http://127.0.0.1:'+port_canteen+'/api/canteen/'+day+'/dinner'
     r = requests.get(url=url)
     data = r.json()
@@ -136,5 +140,20 @@ def add_log(type = 'empty', module = 'empty', info = 'empty'):
     f.write('Type: ' + type + ' Module: ' + module + ' Info: ' + info + '\n')
     f.close()
 
+def process_day(_day):
+    print(_day)
+    day=_day[0:2]
+    month=_day[2:4]
+    print(_day[0])
+    print(_day[2])
+    if _day[0] == '0':
+        day = _day[1]
+    if _day[2] == '0':
+        month = _day[3]
+    print(day+month+_day[4:8])
+    return day+month+_day[4:8]
+
+
+    return day
 if __name__ == '__main__':
     app.run(port=3999)

@@ -43,6 +43,7 @@ def canteen_menu():
 def canteen_day(day): # day must be in format ddmmyyyy
     add_log('Microservices', 'canteen', 'GET ....')
     global cache
+    print(cache)
     if day in cache:
         print("Hit")
         return jsonify(cache[day])
@@ -50,8 +51,14 @@ def canteen_day(day): # day must be in format ddmmyyyy
         print("Miss")
         url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
         r = requests.get(url=url)
-        _day = day[0:2]
-        _month = day[2:4]
+        if day[0] == 0:
+            _day = day[1]
+        else:
+            _day = day[0:2]
+        if day[2] == 0:
+            _month = day[3]
+        else:
+            _month = day[2:4]
         _year = day[4:8]
         data = r.json()
         fill_cache(data)
@@ -67,6 +74,7 @@ def canteen_day(day): # day must be in format ddmmyyyy
 def canteen_day_lunch(day): # day must be in format ddmmyyyy
     add_log('Microservices', 'canteen', 'GET ....')
     global cache
+    print(cache)
     if day in cache:
         print("Hit")
         daily_info = cache[day]
@@ -77,8 +85,14 @@ def canteen_day_lunch(day): # day must be in format ddmmyyyy
     else:
         print("Miss")
         url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
-        _day = day[0:2]
-        _month = day[2:4]
+        if day[0] == 0:
+            _day = day[1]
+        else:
+            _day = day[0:2]
+        if day[2] == 0:
+            _month = day[3]
+        else:
+            _month = day[2:4]
         _year = day[4:8]
         r = requests.get(url=url)
         data = r.json()
@@ -98,6 +112,7 @@ def canteen_day_lunch(day): # day must be in format ddmmyyyy
 def canteen_day_dinner(day): # day must be in format ddmmyyyy
     add_log('Microservices', 'canteen', 'GET ....')
     global cache
+    print(cache)
     if day in cache:
         print("Hit")
         daily_info = cache[day]
@@ -108,12 +123,19 @@ def canteen_day_dinner(day): # day must be in format ddmmyyyy
     else:
         print("Miss")
         url = 'https://fenix.tecnico.ulisboa.pt/api/fenix/v1/canteen'
-        _day = day[0:2]
-        _month = day[2:4]
+        if day[0] == 0:
+            _day = day[1]
+        else:
+            _day = day[0:2]
+        if day[2] == 0:
+            _month = day[3]
+        else:
+            _month = day[2:4]
         _year = day[4:8]
         r = requests.get(url=url)
         data = r.json()
         fill_cache(data)
+        print(cache)
         for item in data:
             if item['day'] == _day+'/'+_month+'/'+_year:
                 print(_day+'/'+_month+'/'+_year)

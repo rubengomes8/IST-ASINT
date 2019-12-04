@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import jsonify
+from flask import redirect
 import requests
 from flask import request
 import auth
@@ -11,9 +12,77 @@ port_api='3999'
 port_webpages='3998'
 log_path='./log.txt'
 
+redirect_uri = "http://127.0.0.1:3998/userAuth" # this is the address of the page on this app
+client_id= "1695915081465934" # copy value from the app registration
+clientSecret = "WVVcjUVINVFwgXDyG1VOzLNN5Q4AU6tHt8/6LKFsswA+Tj00Yc9j1ryu5AKyrBDv+no+UbIUIB3INUWzw1w9Mg==" # copy value from the app registration
+fenixLoginpage= "https://fenix.tecnico.ulisboa.pt/oauth/userdialog?client_id=%s&redirect_uri=%s"
+fenixacesstokenpage = 'https://fenix.tecnico.ulisboa.pt/oauth/access_token'
 
+loginName = False
+userToken = None
+code = False
 
 @app.route('/', methods=['GET'])
+def login():
+    return render_template("Login.html", username=loginName)
+
+@app.route('/private', methods=['GET'])
+def private_page():
+    if loginName == False:
+        redPage = fenixLoginpage % (client_id, redirect_uri)
+        return redirect(redPage)
+    else:
+        print(userToken)
+        params = {'access_token': userToken}
+        resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params=params)
+
+        if (resp.status_code == 200):
+            r_info = resp.json()
+            print(r_info)
+            return render_template("privPage.html", username=loginName, name=r_info['name'], json=r_info)
+        else:
+            return "oops"
+
+@app.route('/userAuth')
+def userAuthenticated():
+    #This page is accessed when the user is authenticated by the fenix login pagesetup
+
+    #first we get the secret code retuner by the FENIX login
+    code = request.args['code']
+    print ("code "+request.args['code'])
+
+
+    # we now retrieve a fenix access token
+    payload = {'client_id': client_id, 'client_secret': clientSecret, 'redirect_uri' : redirect_uri, 'code' : code, 'grant_type': 'authorization_code'}
+    response = requests.post(fenixacesstokenpage, params = payload)
+    print (response.url)
+    print (response.status_code)
+    if(response.status_code == 200):
+        #if we receive the token
+        print ('getting user info')
+        r_token = response.json()
+        print(r_token)
+
+        params = {'access_token': r_token['access_token']}
+        resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
+        r_info = resp.json()
+        print( r_info)
+
+        # we store it
+        global loginName
+        loginName = r_info['username']
+        global userToken
+        userToken = r_token['access_token']
+
+        #now the user has done the login
+        #return jsonify(r_info)
+        #we show the returned infomration
+        #but we could redirect the user to the private page
+        return redirect('/services') #comment the return jsonify....
+    else:
+        return 'oops2'
+
+@app.route('/services', methods=['GET'])
 def initial_menu():
     auth.request_user_permission()
     add_log('Backend', 'Web Pages', 'GET mainPage.html')
