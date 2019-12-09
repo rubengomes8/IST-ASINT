@@ -13,7 +13,31 @@ port_log='4003'
 log_path = './log.txt'
 # SECRETARIAS
 
-@app.route('/api/secretariats/', methods=['GET'])
+@app.route('/api/<path:subpath>', methods=['GET', 'POST'])
+def api(subpath):
+    print("asdfsaesrdgtedw:", subpath)
+    words = subpath.split('/')
+    microservice = words[0]
+    if microservice == 'secretariats':
+        port = port_sec
+    elif microservice == 'canteen':
+        port = port_canteen
+    elif microservice == 'rooms':     
+        port = port_rooms
+    else:
+        return {'msg': 'Not Found'}
+
+    url = 'http://127.0.0.1:'+port+'/api/'+subpath
+    if request.method=='GET':
+        return jsonify(requests.get(url=url).json())
+    elif request.method=='POST':
+        print(url)
+        
+        data = request.form
+        print(data)
+        return jsonify(requests.post(url=url, data=data).json())
+
+'''@app.route('/api/secretariats/', methods=['GET'])
 def secretariats():
     if request.method=='GET':
         send_log('backend: api, get all secretariats, GET') 
@@ -149,7 +173,7 @@ def room_day_events(_id, day):
         url = 'http://127.0.0.1:'+port_rooms+'/api/rooms/'+_id+'/events/'+day
         r = requests.get(url=url)
         data = r.json()
-        return jsonify(data)
+        return jsonify(data)'''
 
 def add_log(type = 'empty', module = 'empty', info = 'empty'):
     global log_path
@@ -164,4 +188,4 @@ def send_log(msg):
     requests.post(url=url, data={'log': str(date) + ' - ' + msg})
     
 if __name__ == '__main__':
-    app.run(port=3999)
+    app.run(port=3999, debug=True)

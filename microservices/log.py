@@ -13,6 +13,8 @@ def add_log():
     if request.method == "POST":
         log = str(request.form['log'])       
         db.addLog(log)
+        data={'msg': '200 - OK'}
+        return data
     
 
 @app.route('/getlogs', methods=['GET'])
@@ -21,4 +23,4 @@ def get_logs():
         return jsonify(db.showLogs())
 
 if __name__ == '__main__':
-    app.run(port=4003)
+    app.run(port=4003,debug=True)

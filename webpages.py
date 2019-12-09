@@ -24,7 +24,7 @@ loginName = False
 userToken = None
 code = False
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET']) 
 def login():
     return render_template("Login.html", username=loginName)
 
@@ -41,7 +41,7 @@ def private_page():
         if (resp.status_code == 200):
             r_info = resp.json()
             print(r_info)
-            return render_template("privPage.html", username=loginName, name=r_info['name'], json=r_info)
+            return render_template("mainPage.html", username=loginName, name=r_info['name'], json=r_info)
         else:
             return "oops"
 
@@ -86,8 +86,8 @@ def userAuthenticated():
 
 @app.route('/services', methods=['GET'])
 def initial_menu():
-    auth.request_user_permission()
-    add_log('Backend', 'Web Pages', 'GET mainPage.html')
+    #auth.request_user_permission()
+    send_log('backend: webpages, render services options, GET')
     return render_template("mainPage.html")
 
 @app.route('/redirect', methods=['GET'])
@@ -180,7 +180,7 @@ def add_secretariat():
             'description': str(request.form['Description'])
         }
         r = requests.post(url=url, data=data)
-    return jsonify(r.json())
+        return jsonify(r.json())
 
 # CANTINA
 
@@ -203,13 +203,11 @@ def canteen_day(day):
         r = requests.get(url=url)
         dinner = r.json()
         return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
-        return jsonify(data)
 
 @app.route('/canteen/<day>/lunch', methods=['GET'])
 def canteen_lunch(day):
     if request.method=='GET':
         send_log('backend: webpages, render canteen lunch, GET')
-        add_log('Backend', 'Web Pages', 'GET showLunch.html')
         url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
         print(url)
         r = requests.get(url=url)
@@ -220,7 +218,6 @@ def canteen_lunch(day):
 def canteen_dinner(day):
     if request.method=='GET':
         send_log('backend: webpages, render canteen dinner, GET')
-        add_log('Backend', 'Web Pages', 'GET showDinner.html')
         url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
         print(url)
         r = requests.get(url=url)
@@ -302,6 +299,8 @@ def send_log(msg):
     url = 'http://127.0.0.1:'+port_log+'/addlog'
     date = datetime.datetime.now()
     requests.post(url=url, data={'log': str(date) + ' - ' + msg})
+    data={'msg' : '200 - OK'}
+    return data
 
 if __name__ == '__main__':
-    app.run(port=3998)
+    app.run(port=3998,debug=True)

@@ -18,6 +18,8 @@ class logDB:
         f = open('bd_dump'+self.name, 'wb')
         pickle.dump(self.logs, f)
         f.close()
+        data={'msg': '200 - OK'}
+        return data
 
     def showLogs(self):
         return self.logs 
