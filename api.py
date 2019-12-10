@@ -22,7 +22,7 @@ def api(subpath):
         port = port_sec
     elif microservice == 'canteen':
         port = port_canteen
-    elif microservice == 'rooms':     
+    elif microservice == 'room':     
         port = port_rooms
     elif microservice == 'logs':
         port = port_log

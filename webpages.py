@@ -343,6 +343,8 @@ def room(_id):
     global users_dict
     try:
         if request.args['id'] in users_dict.keys():
+            print("key ", request.args['id'])
+            print("id room ", _id)
             send_log('backend: webpages, render room by id, GET')
             url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
             r = requests.get(url=url)
@@ -350,7 +352,9 @@ def room(_id):
             if 'error' in data.keys():
                 return jsonify(data)
             else:
+                print("render show room!!")
                 return render_template("showRoom.html", room=data,  port_webpages=port_webpages, key=request.args['id'])
+                #return jsonify(data)
         else:
             return redirect('/private')
     except:

@@ -20,7 +20,7 @@ log_path = './log.txt'
 
 port_log='4003'
 
-@app.route('/api/rooms', methods=['GET'])
+@app.route('/api/room', methods=['GET'])
 def api_rooms():
     if request.method=='GET':
         send_log('microservice: rooms, get rooms, GET')
@@ -29,7 +29,7 @@ def api_rooms():
         data = r.json()
         return jsonify(data)
 
-@app.route('/api/rooms/<_id>', methods=['GET'])
+@app.route('/api/room/<_id>', methods=['GET'])
 def search(_id):
     
     if request.method == "GET":
@@ -55,7 +55,7 @@ def search(_id):
                 return jsonify(error)
 
 
-@app.route('/api/rooms/<_id>/location', methods=['GET'])
+@app.route('/api/room/<_id>/location', methods=['GET'])
 def show_location(_id):
     
     if request.method == "GET":
@@ -103,7 +103,7 @@ def show_location(_id):
        
     return jsonify(room)
 
-@app.route('/api/rooms/<_id>/events', methods=['GET'])
+@app.route('/api/room/<_id>/events', methods=['GET'])
 def show_events(_id):
     
     if request.method == "GET":
@@ -135,7 +135,7 @@ def show_events(_id):
                 error['error'] = 404
                 return jsonify(error)
 
-@app.route('/api/rooms/<_id>/events/<day>', methods=['GET'])
+@app.route('/api/room/<_id>/events/<day>', methods=['GET'])
 def show_date_events(_id, day):
     
     if request.method == "GET": 
