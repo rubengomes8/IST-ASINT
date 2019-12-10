@@ -15,7 +15,7 @@
 
 <div id="lunch_form" style="display:none;">
     <h3>Lunch:</h3>
-    <form action="#"  onsubmit="location.href = document.getElementById('location_l').value +   document.getElementById('daylunch').value + '/lunch' ;return false;" >
+    <form action="#"  onsubmit="location.href = document.getElementById('location_l').value +   document.getElementById('daylunch').value + '/lunch?id={{key}}' ;return false;" >
         Day(ddmmyyyy): <input type="text" name="day" id="daylunch"><br>     
         <input type=submit id=l value="Go" name="/lunch">  
         <input type=hidden id=location_l name=f1 value="http://127.0.0.1:3998/canteen/">
@@ -25,7 +25,7 @@
 
 <div id="dinner_form" style="display:none;">
         <h3>Dinner:</h3>
-        <form action="#"  onsubmit="location.href = document.getElementById('location_d').value +   document.getElementById('daydinner').value + '/dinner' ;return false;" >
+        <form action="#"  onsubmit="location.href = document.getElementById('location_d').value +   document.getElementById('daydinner').value + '/dinner?id={{key}}' ;return false;" >
             Day(ddmmyyyy): <input type="text" name="day" id="daydinner"><br>     
             <input type=submit id=d value="Go" name="/lunch">  
             <input type=hidden id=location_d name=f1 value="http://127.0.0.1:3998/canteen/">            
@@ -34,7 +34,7 @@
     
 <div id="both_form" style="display:none;">
         <h3>Both:</h3>
-        <form action="#"  onsubmit="location.href = document.getElementById('location_b').value +   document.getElementById('dayboth').value  ;return false;" >
+        <form action="#"  onsubmit="location.href = document.getElementById('location_b').value +   document.getElementById('dayboth').value +'?id={{key}}' ;return false;" >
             Day(ddmmyyyy): <input type="text" name="day" id="dayboth"><br>     
             <input type=submit id=d value="Go" name="/lunch">  
             <input type=hidden id=location_b name=f1 value="http://127.0.0.1:3998/canteen/">            

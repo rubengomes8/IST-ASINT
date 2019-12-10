@@ -6,6 +6,7 @@ import requests
 from flask import request
 import auth
 import datetime
+import uuid
 
 app = Flask(__name__)
 
@@ -23,13 +24,16 @@ fenixacesstokenpage = 'https://fenix.tecnico.ulisboa.pt/oauth/access_token'
 loginName = False
 userToken = None
 code = False
-
+users_dict={}
 @app.route('/', methods=['GET']) 
 def login():
     return render_template("Login.html", username=loginName)
 
 @app.route('/private', methods=['GET'])
 def private_page():
+    redPage = fenixLoginpage % (client_id, redirect_uri)
+    return redirect(redPage)
+    '''
     if loginName == False:
         redPage = fenixLoginpage % (client_id, redirect_uri)
         return redirect(redPage)
@@ -44,6 +48,7 @@ def private_page():
             return render_template("mainPage.html", username=loginName, name=r_info['name'], json=r_info)
         else:
             return "oops"
+    '''
 
 @app.route('/userAuth')
 def userAuthenticated():
@@ -61,29 +66,34 @@ def userAuthenticated():
     print (response.status_code)
     if(response.status_code == 200):
         #if we receive the token
+        
         print ('getting user info')
         r_token = response.json()
         print(r_token)
 
         params = {'access_token': r_token['access_token']}
+        
         resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
         r_info = resp.json()
-        print( r_info)
+        #precisamos do nome e fot
+
+        #print( r_info)
 
         # we store it
-        global loginName
-        loginName = r_info['username']
-        global userToken
-        userToken = r_token['access_token']
-
+        key = uuid.uuid1()
+        global users_dict
+        users_dict[str(key)] = (r_info['username'], r_token['access_token'])
+        print(users_dict)
         #now the user has done the login
         #return jsonify(r_info)
         #we show the returned infomration
         #but we could redirect the user to the private page
-        return redirect('/services') #comment the return jsonify....
+        #return redirect('/services') #comment the return jsonify....
+        send_log('backend: webpages, render services options, GET')
+        return render_template("mainPage.html", key=key)
     else:
         return 'oops2'
-
+'''
 @app.route('/services', methods=['GET'])
 def initial_menu():
     #auth.request_user_permission()
@@ -103,139 +113,226 @@ def get_code():
     expires_in = data['expires_in']
     print(data)
     return jsonify(data)
-
+'''
 # SECRETARIA
 
 @app.route('/secretariats', methods=['GET'])
 def secretariats_menu():
-   if request.method=='GET':
-        send_log('backend: webpages, render secretariats options, GET')
-        return render_template("secretariatsMenu.html")
+    try:
+        global users_dict    
+        if request.args['id'] in users_dict.keys():    
+            if request.method=='GET':
+                send_log('backend: webpages, render secretariats options, GET')
+                return render_template("secretariatsMenu.html", key=request.args['id'])
+        else:
+            print("else")
+            return redirect('/private')
+    except:
+        return redirect('/private')
+
 
 @app.route('/secretariats/all', methods=['GET'])
 def all_secretariats():
-    if request.method == 'GET':
-        send_log('backend: webpages, render all secretariats, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
-        print(url)
-        r = requests.get(url=url)
-        return render_template("allSecretariats.html", list_secs=r.json())
+    global users_dict    
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render all secretariats, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
+            print(url)
+            r = requests.get(url=url)
+            return render_template("allSecretariats.html", list_secs=r.json(),key=request.args['id'])
+        else:
+            print("else")
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/secretariats/<_id>', methods=['GET'])
 def secretariat(_id):
-    if request.method == 'GET':
-        send_log('backend: webpages, render secretariat by id, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
-        print(url)
-        r = requests.get(url=url)
-        return render_template("showSecretariat.html", sec_dict=r.json())
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render secretariat by id, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
+            print(url)
+            r = requests.get(url=url)
+            return render_template("showSecretariat.html", sec_dict=r.json(), key=request.args['id'])
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
+
 
 @app.route('/secretariats/<_id>/location', methods=['GET'])
 def secretariat_local(_id):
-    if request.method == 'GET':
-        send_log('backend: webpages, render secretariat location, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
-        print(url)
-        r = requests.get(url=url)
-        print(r.json())
-        return render_template("showSecretariatLocation.html", sec=r.json())
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():   
+            send_log('backend: webpages, render secretariat location, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
+            print(url)
+            r = requests.get(url=url)
+            print(r.json())
+            return render_template("showSecretariatLocation.html", sec=r.json(), key=request.args['id'])
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/secretariats/<_id>/timetable', methods=['GET'])
 def secretariat_timetable(_id):
-    if request.method == 'GET':
-        send_log('backend: webpages, render secretariat timetable, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
-        print(url)
-        r = requests.get(url=url)
-        print(r.json())
-        return render_template("showSecretariatTimetable.html", sec=r.json())
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys(): 
+            send_log('backend: webpages, render secretariat timetable, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
+            print(url)
+            r = requests.get(url=url)
+            print(r.json())
+            return render_template("showSecretariatTimetable.html", sec=r.json())
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
+        
 
 @app.route('/secretariats/<_id>/description', methods=['GET'])
 def secretariat_desc(_id):
-    if request.method  == 'GET':
-        send_log('backend: webpages, render secretariat description, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
-        print(url)
-        r = requests.get(url=url)
-        print(r.json())
-        return render_template("showSecretariatDescription.html", sec=r.json())
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():        
+            send_log('backend: webpages, render secretariat description, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
+            print(url)
+            r = requests.get(url=url)
+            print(r.json())
+            return render_template("showSecretariatDescription.html", sec=r.json())
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/secretariats/create',methods=['GET'])
 def create_sec_form():
-    if request.method  == 'GET':
-        send_log('backend: webpages, render add secretariat form, GET')
-        return render_template("addSecretariatForm.html")
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():   
+            send_log('backend: webpages, render add secretariat form, GET')
+            return render_template("addSecretariatForm.html", key=request.args['id'])
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/secretariats/addSecretariat', methods=['POST'])
-def add_secretariat():
-    
-    if request.method == "POST":
-        send_log('backend: webpages,  add secretariat, POST')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/addSecretariat'
-        data = {
-            'name': str(request.form['Name']),
-            'campus': str(request.form['Campus']),
-            'building': str(request.form['Building']),
-            'hours': str(request.form['Hours']),
-            'description': str(request.form['Description'])
-        }
-        r = requests.post(url=url, data=data)
-        return jsonify(r.json())
+def add_secretariat():    
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages,  add secretariat, POST')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/addSecretariat'
+            data = {
+                'name': str(request.form['Name']),
+                'campus': str(request.form['Campus']),
+                'building': str(request.form['Building']),
+                'hours': str(request.form['Hours']),
+                'description': str(request.form['Description'])
+            }
+            r = requests.post(url=url, data=data)
+            return jsonify(r.json())
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 # CANTINA
 
 @app.route('/canteen', methods=['GET'])
 def canteen():
-    send_log('backend: webpages, render canteen form, GET')
-    return render_template('canteenForm.html')
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render canteen form, GET')
+            return render_template('canteenForm.html', key=request.args['id'] )
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 
 @app.route('/canteen/<day>', methods=['GET'])
 def canteen_day(day):
-    if request.method=='GET':
-        send_log('backend: webpages, render canteen lunch and dinner, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
-        print(url)
-        r = requests.get(url=url)
-        lunch = r.json()
-        url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
-        print(url)
-        r = requests.get(url=url)
-        dinner = r.json()
-        return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render canteen lunch and dinner, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
+            print(url)
+            r = requests.get(url=url)
+            lunch = r.json()
+            url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
+            print(url)
+            r = requests.get(url=url)
+            dinner = r.json()
+            return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/canteen/<day>/lunch', methods=['GET'])
 def canteen_lunch(day):
-    if request.method=='GET':
-        send_log('backend: webpages, render canteen lunch, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
-        print(url)
-        r = requests.get(url=url)
-        data = r.json()
-        return render_template("showLunch.html", list=data)
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render canteen lunch, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
+            print(url)
+            r = requests.get(url=url)
+            data = r.json()
+            return render_template("showLunch.html", list=data)
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/canteen/<day>/dinner', methods=['GET'])
 def canteen_dinner(day):
-    if request.method=='GET':
-        send_log('backend: webpages, render canteen dinner, GET')
-        url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
-        print(url)
-        r = requests.get(url=url)
-        data = r.json()
-        return render_template("showDinner.html", list=data)
+    global users_dict  
+    try:
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render canteen dinner, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
+            print(url)
+            r = requests.get(url=url)
+            data = r.json()
+            return render_template("showDinner.html", list=data)
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
     #return jsonify(data)
 
 #Rooms
 
 @app.route('/rooms', methods=['GET'])
 def rooms_menu():
-    if request.method=='GET':
-        send_log('backend: webpages, render rooms form, GET')        
-        return render_template("roomsMenu.html", port_webpages=port_webpages)
+    global users_dict  
+    try:
+        print('users', users_dict)
+        print("Key  ", users_dict[request.args['id']])
+        if request.args['id'] in users_dict.keys():
+            send_log('backend: webpages, render rooms form, GET')        
+            return render_template("roomsMenu.html", port_webpages=port_webpages, key=request.args['id'])
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/rooms/<_id>', methods=['GET'])
 def room(_id):
-     if request.method=='GET':
+    
+    if request.method=='GET':
         send_log('backend: webpages, render room by id, GET') 
        
         url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id

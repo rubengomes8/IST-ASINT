@@ -13,7 +13,7 @@
 
 <h1>Search Place</h1>
 
-<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false">
+<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value +'?id={{key}}'; return false">
     ID:<input type="text" id="q" name="f2">
     <input type="submit" value="go">
     <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
