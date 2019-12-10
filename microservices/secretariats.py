@@ -63,6 +63,22 @@ def add_secretariat():
         sec = db.addSecretariats(name, building, campus, hours, description)
     return jsonify(sec.__dict__)
 
+
+@app.route('/api/secretariats/editSecretariat', methods=['POST'])
+def edit_secretariat():
+    send_log('microservice: secretariats, edit secretariat, POST')
+    name = str(request.form['name'])
+    campus =str(request.form['campus'])
+    building=str(request.form['building'])
+    hours=str(request.form['hours'])
+    description=str(request.form['description'])
+    found = db.editSecretariats(name, building, campus, hours, description)
+    print(found)
+    if found == False:
+        return jsonify({'error': 'Secretariat not found.'})
+    else:
+        return jsonify({'200': 'OK'})
+
 @app.route('/api/secretariats/<_id>', methods=['GET'])
 def single_secretariat(_id):
     if request.method == "GET":

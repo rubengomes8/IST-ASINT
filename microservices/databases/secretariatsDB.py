@@ -66,6 +66,24 @@ class secretariatsDB:
                 f.close()
                 return self.secretariats[s_id]
 
+        def editSecretariats(self, name, building, campus, hours, description):
+                found = False
+                print(self.secretariats)
+                for sec in self.secretariats.items():
+                        if sec[1].name == name:
+                                sec[1].building = building
+                                sec[1].campus = campus
+                                sec[1].hours = hours
+                                sec[1].description = description
+                                found = True
+                if found == False:
+                        return False
+                else:
+                        f = open('bd_dump'+self.name, 'wb')
+                        pickle.dump(self.secretariats, f)
+                        f.close()
+                        return True
+
         def changeHours(self, hours, _id):
                 self.secretariats[_id].timetable = hours
 

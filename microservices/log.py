@@ -17,7 +17,7 @@ def add_log():
         return data
     
 
-@app.route('/getlogs', methods=['GET'])
+@app.route('/api/logs/getlogs', methods=['GET'])
 def get_logs():
     if request.method == "GET":
         return jsonify(db.showLogs())

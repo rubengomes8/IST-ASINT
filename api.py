@@ -24,6 +24,8 @@ def api(subpath):
         port = port_canteen
     elif microservice == 'rooms':     
         port = port_rooms
+    elif microservice == 'logs':
+        port = port_log
     else:
         return {'msg': 'Not Found'}
 
