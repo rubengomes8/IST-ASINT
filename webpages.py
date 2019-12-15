@@ -106,7 +106,7 @@ def secretariats_menu():
         if str(request.args['id']) in users_dict:
             send_log('backend: webpages, render secretariats options, GET')
             print("Secretariats menu key:", request.args['id'])
-            return render_template("secretariatsMenu.html", key=request.args['id'])
+            return render_template("secretariatsMenu.html", key=request.args['id'],port_webpages=port_webpages)
         else:
             print("else in secretariats_menu")
             return redirect('/private')
