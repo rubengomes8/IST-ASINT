@@ -30,6 +30,7 @@ adminName = False
 adminToken = None
 admin_username = "admin"
 admin_password = "123"
+secret = 1
 
 @app.route('/', methods=['GET']) 
 def login():
@@ -48,6 +49,26 @@ def admin():
         adminToken = str(uuid.uuid1())
         users_dict[str(adminToken)] = ("admin", str(adminToken))
         return render_template("mainPage.html", key=str(adminToken))
+
+@app.route('/mysecret', methods=['GET'])
+def my_secret():
+    key = request.args['id']
+    return jsonify(users_dict[key][4])
+
+@app.route('/findsecret', methods=['GET'])
+def find_secret():
+    return render_template("findSecret.html", key=request.args['id'], users=users_dict)
+
+@app.route('/getuser', methods=['POST'])
+def getuser():
+    if(request.is_json):
+        s = request.json["secret"]
+        for user in users_dict.values():
+            if s == user[4]:
+                return jsonify({'name': user[2], 'photo': user[3]['data']}) #only istid
+        return jsonify({'name': 'user not found', 'photo': 'user not found'})
+    else:
+        return "XXXX"
 
 @app.route('/private', methods=['GET'])
 def private_page():
@@ -68,10 +89,13 @@ def userAuthenticated():
         params = {'access_token': r_token['access_token']}
         resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
         r_info = resp.json()
+        print(r_info)
         # precisamos de guardar o nome e foto
         key = str(uuid.uuid1())
         global users_dict
-        users_dict[str(key)] = (r_info['username'], r_token['access_token'])
+        global secret
+        users_dict[str(key)] = (r_info['username'], r_token['access_token'], r_info['name'], r_info['photo'], str(secret)) # photo é um dict com {'type': 'image/png', 'data': 'sdsdsds'}
+        secret += 1
         send_log('backend: webpages, render services options, GET')
         return render_template("mainPage.html", key=str(key))
     else:
