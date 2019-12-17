@@ -179,7 +179,19 @@ def secretariat(_id):
             return redirect('/private')
     except:
         return redirect('/private')
-
+@app.route('/secretariats/test/<_id>', methods=['GET'])
+def secretariat_test(_id):
+    global users_dict  
+    try:
+        if str(request.args['id']) in users_dict:
+            send_log('backend: webpages, render secretariat by id, GET')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
+            r = requests.get(url=url)
+            return jsonify(r.json())
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
 
 @app.route('/secretariats/<_id>/location', methods=['GET'])
 def secretariat_local(_id):

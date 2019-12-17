@@ -1,37 +1,117 @@
-<!DOCTYPE html>
-<html>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-	<title>QRCode</title>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Main Page</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  
+
+  <script type="text/javascript">
+    //<![CDATA[
+    function reqResponse () {
+            //console.log(this.responseText);
+           /* 
+         o = JSON.parse(this.responseText);
+                       console.log(o[10]);
+        s="<ol>";
+        var i =0;
+        var len = o.length
+        for (i = 0, len = o.length; i < len; i++) {
+            s+= "<li>";
+            s += o[i];
+            s+= "</li>";
+        }
+        s+="</ol>";
+        document.getElementById('divDestiny').innerHTML = s;
+        */
+    }
+
+
+     function autocomplete_f(content) {
+       
+        console.log(content)
+        url='http://127.0.0.1:3998/secretariats/'+content
+        console.log(url)
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqResponse);
+        oReq.open("GET", url);
+        oReq.setRequestHeader("Content-type", "application/json");
+        oReq.send()
+
+        /*
+        console.log(this.responseText);
+        document.getElementById('divDestiny').innerHTML = t;
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqResponse);
+        oReq.open("POST", "/autocomplete");
+        oReq.setRequestHeader("Content-type", "application/json");
+        oReq.send('{"str":"'+  t + '"}');
+        */
+    }
+    //]]>
+</script>
+
+
+
+
+
 </head>
 <body>
+
+<!--The secretariats Database has now {{ count}} services.-->
+
+<h1>Secretariats:</h1>
+
+
+<!--
+<h2>Links</h2>
+<a href="">Secretariat info</a>
+<a href="">Secretariat Location</a>
+<a href="">Secretariat Description</a>
+<a href="">Secretariat timetable</a>
+-->
+<video id="preview"></video>
+<p id="QRcode"></p>
+<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value +'?id={{key}}'; return false" >
+    ID:<input type="text" id="q" name="f2" >
+    <input type="submit" value="go">
+    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/secretariats/">
+</form>
+<script type="text/javascript">
+  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+  scanner.addListener('scan', function (content) {
    
-    
-    <video id="preview"></video>
-    <p id="QRcode"></p>
-    <form action="#"   >
-        ID:<input type="text" id="q" name="f2">
-        <input type="submit" value="go">
-        <input type=hidden id=f1 name=f1 value="asdf">
-    </form>
-    <script type="text/javascript">
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-       
-        //document.getElementById("q").value = content;
-        document.getElementById("q").value = content;
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
-    </script>
-   
+    //document.getElementById("q").value = content;
+    document.getElementById("q").value = content;
+    autocomplete_f(content)    
+  });
+  Instascan.Camera.getCameras().then(function (cameras) {
+    if (cameras.length > 0) {
+      scanner.start(cameras[0]);
+    } else {
+      console.error('No cameras found.');
+    }
+  }).catch(function (e) {
+    console.error(e);
+  });
+</script>
+
+
+<a href="/secretariats/all?id={{key}}">List all secretariats</a>
+
+<h1>Secretariats Admin:</h1>
+
+<a href="/secretariats/create?id={{key}}">Create secretariat</a>
+<a href="/secretariats/edit?id={{key}}">Edit secretariat</a>
+<!--
+<a href="/api/secretariats/hours">Change timetable</a>
+<a href="/api/secretariats/description">Change Description</a> 
+-->
+
+
 </body>
 </html>
