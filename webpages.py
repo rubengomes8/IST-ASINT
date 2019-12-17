@@ -31,6 +31,7 @@ adminToken = None
 admin_username = "admin"
 admin_password = "123"
 secret = 1
+get_users_dict = {}
 
 @app.route('/', methods=['GET']) 
 def login():
@@ -50,10 +51,16 @@ def admin():
         users_dict[str(adminToken)] = ("admin", str(adminToken))
         return render_template("mainPage.html", key=str(adminToken))
 
+@app.route('/getgetusersdict', methods=['POST'])
+def get_getusersdict():
+    s = request.json["secret"]
+    return jsonify({'name': get_users_dict[s][0], 'photo': get_users_dict[s][1]['data']})
+
+
 @app.route('/mysecret', methods=['GET'])
 def my_secret():
-    key = request.args['id']
-    return jsonify(users_dict[key][4])
+    key = str(request.args['id'])
+    return render_template("mySecret.html", key=key, secret=users_dict[key][4])
 
 @app.route('/findsecret', methods=['GET'])
 def find_secret():
@@ -61,10 +68,13 @@ def find_secret():
 
 @app.route('/getuser', methods=['POST'])
 def getuser():
+    global get_users_dict
     if(request.is_json):
         s = request.json["secret"]
+        key = request.json["key"]
         for user in users_dict.values():
             if s == user[4]:
+                get_users_dict[s] = (users_dict[str(key)][2], users_dict[str(key)][3]) # name and photo
                 return jsonify({'name': user[2], 'photo': user[3]['data']}) #only istid
         return jsonify({'name': 'user not found', 'photo': 'user not found'})
     else:
@@ -94,8 +104,10 @@ def userAuthenticated():
         key = str(uuid.uuid1())
         global users_dict
         global secret
-        users_dict[str(key)] = (r_info['username'], r_token['access_token'], r_info['name'], r_info['photo'], str(secret)) # photo é um dict com {'type': 'image/png', 'data': 'sdsdsds'}
+        # 0 - username, 1 - token, 2 - name, 3 - photo, 4 - secret, 5 - name_friend, 6 - photo_friend
+        users_dict[str(key)] = (r_info['username'], r_token['access_token'], r_info['name'], r_info['photo'], str(secret), "", {}) # photo é um dict com {'type': 'image/png', 'data': 'sdsdsds'}
         secret += 1
+        get_users_dict[secret] = ("", {})
         send_log('backend: webpages, render services options, GET')
         return render_template("mainPage.html", key=str(key))
     else:
