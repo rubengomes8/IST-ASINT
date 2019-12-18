@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generic HTML</title>
+</head>
+
+<body>
+
+    <button onclick="printt();">
+        show
+    </button>
+
+    <script type="text/javascript" >
+
+        var data = '{{data}}';
+        document.getElementById('divDestiny').innerHTML = JSON.stringify(data, undefined, 4);
+
+        function printt(){
+            document.getElementById('divDestiny').innerHTML = JSON.stringify(data, undefined, 4);
+        }
+    </script>
+
+</body>
+
+<div id="divDestiny"></div>
+
+</html>

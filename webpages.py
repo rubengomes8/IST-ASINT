@@ -10,9 +10,13 @@ import uuid
 
 app = Flask(__name__)
 
-port_api='3999'
+port_api='3998'
 port_webpages='3998'
 log_path='./log.txt'
+port_log='4003'
+port_sec = '4000'
+port_canteen = '4001'
+port_rooms = '4002'
 port_log='4003'
 
 redirect_uri = "http://127.0.0.1:3998/userAuth" # this is the address of the page on this app
@@ -37,6 +41,33 @@ get_users_dict = {}
 def login():
     return render_template("Login.html", username=loginName)
 
+
+@app.route('/api/<path:subpath>', methods=['GET', 'POST'])
+def api(subpath):
+    print("asdfsaesrdgtedw:", subpath)
+    words = subpath.split('/')
+    microservice = words[0]
+    if microservice == 'secretariats':
+        port = port_sec
+    elif microservice == 'canteen':
+        port = port_canteen
+    elif microservice == 'room':
+        port = port_rooms
+    elif microservice == 'logs':
+        port = port_log
+    else:
+        return {'msg': 'Not Found'}
+
+    url = 'http://127.0.0.1:' + port + '/api/' + subpath
+    if request.method == 'GET':
+        return jsonify(requests.get(url=url).json())
+    elif request.method == 'POST':
+        print(url)
+
+        data = request.form
+        print(data)
+        return jsonify(requests.post(url=url, data=data).json())
+
 @app.route('/users', methods=['GET'])
 def show_users_dict():
     return jsonify(users_dict)
@@ -54,7 +85,7 @@ def admin():
 @app.route('/getgetusersdict', methods=['POST'])
 def get_getusersdict():
     s = request.json["secret"]
-    return jsonify({'name': get_users_dict[s][0], 'photo': get_users_dict[s][1]['data']})
+    return jsonify({'name': get_users_dict[int(s)][0], 'photo': get_users_dict[int(s)][1]['data']})
 
 
 @app.route('/mysecret', methods=['GET'])
@@ -74,11 +105,20 @@ def getuser():
         key = request.json["key"]
         for user in users_dict.values():
             if s == user[4]:
-                get_users_dict[s] = (users_dict[str(key)][2], users_dict[str(key)][3]) # name and photo
+                get_users_dict[int(s)] = (users_dict[str(key)][2], users_dict[str(key)][3]) # name and photo
                 return jsonify({'name': user[2], 'photo': user[3]['data']}) #only istid
         return jsonify({'name': 'user not found', 'photo': 'user not found'})
     else:
         return "XXXX"
+
+@app.route('/clean', methods=['POST'])
+def clean():
+    global get_users_dict
+    if(request.is_json):
+        s = request.json["secret"]
+        for user in users_dict.values():
+            if s == user[4]:
+                get_users_dict[int(s)] = ("", {})
 
 @app.route('/private', methods=['GET'])
 def private_page():
@@ -336,7 +376,12 @@ def canteen_day(day):
             url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
             r = requests.get(url=url)
             dinner = r.json()
-            return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
+            print(lunch)
+            print(dinner)
+            if 'error' in lunch and 'error' in dinner:
+                return jsonify("{'error': 'Canteen closed'}")
+            else:
+                return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
         else:
             return redirect('/private')
     except:
@@ -351,7 +396,11 @@ def canteen_lunch(day):
             url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
             r = requests.get(url=url)
             data = r.json()
-            return render_template("showLunch.html", list=data)
+            if 'error' in data:
+                return jsonify("{'error': 'Canteen closed'}")
+            else:
+                return render_template("showLunch.html", list=data)
+            #return render_template("generic.html", data=data)
         else:
             return redirect('/private')
     except:
@@ -366,7 +415,10 @@ def canteen_dinner(day):
             url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
             r = requests.get(url=url)
             data = r.json()
-            return render_template("showDinner.html", list=data)
+            if 'error' in data:
+                return jsonify("{'error': 'Canteen closed'}")
+            else:
+                return render_template("showDinner.html", list=data)
         else:
             return redirect('/private')
     except:
@@ -465,6 +517,23 @@ def room_events_day(_id,day):
             return redirect('/private')
     except:
         return redirect('/private')
+
+
+# MOBILE APP
+
+@app.route('/qrcode', methods=['GET'])
+def qrcode():
+    global users_dict
+    try:
+        if str(request.args['id']) in users_dict:
+            send_log('mobile app: qrcode')
+            return render_template("qrCode.html", key=request.args['id'])
+        else:
+            return redirect('/private')
+    except:
+        return redirect('/private')
+
+
 
 def send_log(msg):
     url = 'http://127.0.0.1:'+port_log+'/addlog'

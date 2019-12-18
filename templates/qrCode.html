@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Qr Code</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+
+
+  <script type="text/javascript">
+    //<![CDATA[
+    function reqResponse () {
+            console.log(this.responseText);
+            document.getElementById("info").innerHTML =this.responseText;
+           /*
+         o = JSON.parse(this.responseText);
+                       console.log(o[10]);
+        s="<ol>";
+        var i =0;
+        var len = o.length
+        for (i = 0, len = o.length; i < len; i++) {
+            s+= "<li>";
+            s += o[i];
+            s+= "</li>";
+        }
+        s+="</ol>";
+        document.getElementById('divDestiny').innerHTML = s;
+        */
+    }
+
+
+     function autocomplete_f(content) {
+
+        console.log(content)
+        url_=content
+        list_words = content.split('3998');
+        url = list_words[0] + '3998/api' + list_words[1];
+        console.log(url)
+        //location.replace('http://127.0.0.1:3998/secretariats/'+content+'?id={{key}}')
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqResponse);
+        oReq.open("GET", url, true);
+        oReq.setRequestHeader("Content-type", "application/json");
+        oReq.send()
+
+        /*
+        console.log(this.responseText);
+        document.getElementById('divDestiny').innerHTML = t;
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", reqResponse);
+        oReq.open("POST", "/autocomplete");
+        oReq.setRequestHeader("Content-type", "application/json");
+        oReq.send('{"str":"'+  t + '"}');
+        */
+    }
+    //]]>
+</script>
+
+</head>
+<body>
+
+<video id="preview"></video>
+<p id="QRcode"></p>
+
+<script type="text/javascript">
+  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+  scanner.addListener('scan', function (content) {
+
+    //document.getElementById("q").value = content;
+    //document.getElementById("q").value = content;
+    autocomplete_f(content)
+  });
+  Instascan.Camera.getCameras().then(function (cameras) {
+    if (cameras.length > 0) {
+      scanner.start(cameras[0]);
+    } else {
+      console.error('No cameras found.');
+    }
+  }).catch(function (e) {
+    console.error(e);
+  });
+</script>
+
+<div id="info">
+
+</div>
+
+</body>
+</html>
