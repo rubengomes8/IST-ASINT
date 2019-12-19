@@ -298,8 +298,11 @@ def edit_secretariat():
             'description': str(request.form['Description'])
         }
         r = requests.post(url=url, data=data)
+        if 'error' in r.json():
+            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  " + data['name'] + " does not exist."])
+        else:
         #return jsonify(r.json())
-        return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" edited"])
+            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" edited"])
     else:
         return redirect('/private')
 
