@@ -39,7 +39,7 @@ get_users_dict = {}
 
 @app.route('/', methods=['GET']) 
 def login():
-    return render_template("Login.html", username=loginName)
+    return render_template("Login.html")
 
 
 @app.route('/api/<path:subpath>', methods=['GET', 'POST'])
@@ -87,15 +87,6 @@ def get_getusersdict():
     s = request.json["secret"]
     return jsonify({'name': get_users_dict[int(s)][0], 'photo': get_users_dict[int(s)][1]['data']})
 
-
-@app.route('/mysecret', methods=['GET'])
-def my_secret():
-    key = str(request.args['id'])
-    return render_template("mySecret.html", key=key, secret=users_dict[key][4])
-
-@app.route('/findsecret', methods=['GET'])
-def find_secret():
-    return render_template("findSecret.html", key=request.args['id'], users=users_dict)
 
 @app.route('/getuser', methods=['POST'])
 def getuser():
@@ -151,10 +142,63 @@ def userAuthenticated():
         send_log('backend: webpages, render services options, GET')
         return render_template("mainPage.html", key=str(key))
     else:
-        return 'oops2'
+        return render_template("Login.html")
+
+# SECRETARIA
+
+@app.route('/secretariats', methods=['GET'])
+def secretariats_menu():
+    send_log('backend: webpages, render secretariats options, GET')
+    return render_template("secretariatsMenu.html", port_webpages=port_webpages)
 
 
-# LOGS
+
+@app.route('/secretariats/all', methods=['GET'])
+def all_secretariats():
+    send_log('backend: webpages, render all secretariats, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
+    r = requests.get(url=url)
+    return render_template("allSecretariats.html", list_secs=r.json())
+
+
+
+@app.route('/secretariats/<_id>', methods=['GET'])
+def secretariat(_id):
+    send_log('backend: webpages, render secretariat by id, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
+    r = requests.get(url=url)
+    return render_template("showSecretariat.html", sec_dict=r.json())
+
+@app.route('/secretariats/test/<_id>', methods=['GET'])
+def secretariat_test(_id):
+    send_log('backend: webpages, render secretariat by id, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
+    r = requests.get(url=url)
+    return jsonify(r.json())
+
+@app.route('/secretariats/<_id>/location', methods=['GET'])
+def secretariat_local(_id):
+    send_log('backend: webpages, render secretariat location, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
+    r = requests.get(url=url)
+    return render_template("showSecretariatLocation.html", sec=r.json())
+
+@app.route('/secretariats/<_id>/timetable', methods=['GET'])
+def secretariat_timetable(_id):
+    send_log('backend: webpages, render secretariat timetable, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
+    r = requests.get(url=url)
+    return render_template("showSecretariatTimetable.html", sec=r.json())
+        
+
+@app.route('/secretariats/<_id>/description', methods=['GET'])
+def secretariat_desc(_id):
+    send_log('backend: webpages, render secretariat description, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
+    r = requests.get(url=url)
+    return render_template("showSecretariatDescription.html", sec=r.json())
+
+# ADMIN
 
 @app.route('/logs/getlogs',methods=['GET'])
 def get_logs():
@@ -172,109 +216,6 @@ def get_logs():
         return redirect('/private')
     #except:
         #return redirect('/private')
-
-# SECRETARIA
-
-@app.route('/secretariats', methods=['GET'])
-def secretariats_menu():
-    global users_dict
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariats options, GET')
-            print("Secretariats menu key:", request.args['id'])
-            return render_template("secretariatsMenu.html", key=request.args['id'],port_webpages=port_webpages)
-        else:
-            print("else in secretariats_menu")
-            return redirect('/private')
-    except:
-        return redirect('/private')
-
-
-@app.route('/secretariats/all', methods=['GET'])
-def all_secretariats():
-    global users_dict    
-    try:
-        print("List of All Secretariats key:", request.args['id'])
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render all secretariats, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'
-            r = requests.get(url=url)
-            return render_template("allSecretariats.html", list_secs=r.json(), key=request.args['id'])
-        else:
-            print("else in all_secretariats")
-            return redirect('/private')
-    except:
-        return redirect('/private')
-
-@app.route('/secretariats/<_id>', methods=['GET'])
-def secretariat(_id):
-    global users_dict  
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariat by id, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
-            r = requests.get(url=url)
-            return render_template("showSecretariat.html", sec_dict=r.json(), key=request.args['id'])
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
-@app.route('/secretariats/test/<_id>', methods=['GET'])
-def secretariat_test(_id):
-    global users_dict  
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariat by id, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id
-            r = requests.get(url=url)
-            return jsonify(r.json())
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
-
-@app.route('/secretariats/<_id>/location', methods=['GET'])
-def secretariat_local(_id):
-    global users_dict  
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariat location, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/location'
-            r = requests.get(url=url)
-            return render_template("showSecretariatLocation.html", sec=r.json(), key=request.args['id'])
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
-
-@app.route('/secretariats/<_id>/timetable', methods=['GET'])
-def secretariat_timetable(_id):
-    global users_dict  
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariat timetable, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/timetable'
-            r = requests.get(url=url)
-            return render_template("showSecretariatTimetable.html", sec=r.json())
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
-        
-
-@app.route('/secretariats/<_id>/description', methods=['GET'])
-def secretariat_desc(_id):
-    global users_dict  
-    try:
-        if str(request.args['id']) in users_dict:
-            send_log('backend: webpages, render secretariat description, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/'+_id+'/description'
-            r = requests.get(url=url)
-            return render_template("showSecretariatDescription.html", sec=r.json())
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
 
 @app.route('/secretariats/create',methods=['GET'])
 def create_sec_form():
@@ -331,7 +272,6 @@ def edit_sec_form():
 @app.route('/secretariats/editSecretariat', methods=['POST'])
 def edit_secretariat():
     global users_dict
-    #try:
     if str(request.args['id']) in users_dict:
         send_log('backend: webpages, edit secretariat, POST')
         url = 'http://127.0.0.1:' + port_api + '/api/secretariats/editSecretariat'
@@ -346,177 +286,108 @@ def edit_secretariat():
         return jsonify(r.json())
     else:
         return redirect('/private')
-    #except:
-        #return redirect('/private')
 
 # CANTINA
-
 @app.route('/canteen', methods=['GET'])
 def canteen():
-    global users_dict  
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render canteen form, GET')
-            return render_template('canteenForm.html', key=request.args['id'] )
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render canteen form, GET')
+    return render_template('canteenForm.html')
 
 
 @app.route('/canteen/<day>', methods=['GET'])
 def canteen_day(day):
-    global users_dict  
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render canteen lunch and dinner, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
-            r = requests.get(url=url)
-            lunch = r.json()
-            url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
-            r = requests.get(url=url)
-            dinner = r.json()
-            print(lunch)
-            print(dinner)
-            if 'error' in lunch and 'error' in dinner:
-                return jsonify("{'error': 'Canteen closed'}")
-            else:
-                return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render canteen lunch and dinner, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/lunch'
+    r = requests.get(url=url)
+    lunch = r.json()
+    url = 'http://127.0.0.1:' + port_api + '/api/canteen/' + day + '/dinner'
+    r = requests.get(url=url)
+    dinner = r.json()
+    if 'error' in lunch and 'error' in dinner:
+        return jsonify("{'error': 'Canteen closed'}")
+    else:
+        return render_template("showLunchDinner.html", list_lunch=lunch, list_dinner=dinner)
 
 @app.route('/canteen/<day>/lunch', methods=['GET'])
 def canteen_lunch(day):
-    global users_dict  
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render canteen lunch, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data:
-                return jsonify("{'error': 'Canteen closed'}")
-            else:
-                return render_template("showLunch.html", list=data)
-            #return render_template("generic.html", data=data)
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render canteen lunch, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/lunch'
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data:
+        return jsonify("{'error': 'Canteen closed'}")
+    else:
+        return render_template("showLunch.html", list=data)
 
 @app.route('/canteen/<day>/dinner', methods=['GET'])
 def canteen_dinner(day):
-    global users_dict  
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render canteen dinner, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data:
-                return jsonify("{'error': 'Canteen closed'}")
-            else:
-                return render_template("showDinner.html", list=data)
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
-    #return jsonify(data)
+    send_log('backend: webpages, render canteen dinner, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/canteen/'+day+'/dinner'
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data:
+        return jsonify("{'error': 'Canteen closed'}")
+    else:
+        return render_template("showDinner.html", list=data)
 
 #Rooms
 @app.route('/rooms', methods=['GET'])
 def rooms_menu():
-    global users_dict  
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render rooms form, GET')        
-            return render_template("roomsMenu.html", port_webpages=port_webpages, key=request.args['id'])
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render rooms form, GET')
+    return render_template("roomsMenu.html", port_webpages=port_webpages)
+
 
 @app.route('/rooms/<_id>', methods=['GET'])
 def room(_id):
-    global users_dict
-    try:
-        if request.args['id'] in users_dict.keys():
-            print("key ", request.args['id'])
-            print("id room ", _id)
-            send_log('backend: webpages, render room by id, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data.keys():
-                return jsonify(data)
-            else:
-                print("render show room!!")
-                return render_template("showRoom.html", room=data,  port_webpages=port_webpages, key=request.args['id'])
-                #return jsonify(data)
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render room by id, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoom.html", room=data,  port_webpages=port_webpages)
 
     
         
 @app.route('/rooms/<_id>/location', methods=['GET'])
 def room_location(_id):
-     global users_dict
-     try:
-         if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render room location, GET')
+    send_log('backend: webpages, render room location, GET')
 
-            url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/location'
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data.keys():
-                return jsonify(data)
-            else:
-                return render_template("showRoomLocation.html", room=data,  port_webpages=port_webpages, key=request.args['id'])
-         else:
-             return redirect('/private')
-     except:
-         return redirect('/private')
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/location'
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomLocation.html", room=data,  port_webpages=port_webpages)
+
 
 @app.route('/rooms/<_id>/events', methods=['GET'])
 def room_events(_id):
-    global users_dict
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render room events, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events'
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data.keys():
-                return jsonify(data)
-            else:
-                return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages, key=request.args['id'])
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+    send_log('backend: webpages, render room events, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events'
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
+
 
 
 @app.route('/rooms/<_id>/events/<day>', methods=['GET'])
-def room_events_day(_id,day):
-    global users_dict
-    try:
-        if request.args['id'] in users_dict.keys():
-            send_log('backend: webpages, render room events by day, GET')
-            url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events/'+day
-            r = requests.get(url=url)
-            data = r.json()
-            if 'error' in data.keys():
-                return jsonify(data)
-            else:
-                return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages, key=request.args['id'])
-        else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+def room_events_day(_id, day):
+    send_log('backend: webpages, render room events by day, GET')
+    url = 'http://127.0.0.1:' + port_api + '/api/room/'+_id+'/events/'+day
+    r = requests.get(url=url)
+    data = r.json()
+    if 'error' in data.keys():
+        return jsonify(data)
+    else:
+        return render_template("showRoomEvents.html", room=data, events=data['events'] ,port_webpages=port_webpages)
+
+
 
 
 # MOBILE APP
@@ -529,10 +400,41 @@ def qrcode():
             send_log('mobile app: qrcode')
             return render_template("qrCode.html", key=request.args['id'])
         else:
+            send_log('mobile app: qr code | INVALID KEY')
             return redirect('/private')
     except:
+        send_log('mobile app: qr code | INVALID KEY')
         return redirect('/private')
 
+@app.route('/mysecret', methods=['GET'])
+def my_secret():
+    global users_dict
+    key = str(request.args['id'])
+    try:
+        if key in users_dict:
+            send_log('mobile app: my secret')
+            return render_template("mySecret.html", key=key, secret=users_dict[key][4])
+        else:
+            send_log('mobile app: my secret | INVALID KEY')
+            return redirect('/private')
+    except:
+        send_log('mobile app: my secret | INVALID KEY')
+        return redirect('/private')
+
+
+@app.route('/findsecret', methods=['GET'])
+def find_secret():
+    global users_dict
+    try:
+        if str(request.args['id']) in users_dict:
+            send_log('mobile app: find secret')
+            return render_template("findSecret.html", key=request.args['id'], users=users_dict)
+        else:
+            send_log('mobile app: find secret | INVALID KEY')
+            return redirect('/private')
+    except:
+        send_log('mobile app: find secret | INVALID KEY')
+        return redirect('/private')
 
 
 def send_log(msg):

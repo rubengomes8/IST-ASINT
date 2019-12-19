@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Main Page</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>-->
 </head>
 <body>
 
@@ -21,14 +21,16 @@
     <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
 </form>
 -->
-
+<!--
 <video id="preview"></video>
-<p id="QRcode"></p>
-<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value +'?id={{key}}'; return false" >
+<p id="QRcode"></p>-->
+<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false" >
     ID:<input type="text" id="q" name="f2">
     <input type="submit" value="go">
     <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
 </form>
+
+<!--
 <script type="text/javascript">
   let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
   scanner.addListener('scan', function (content) {
@@ -46,6 +48,6 @@
     console.error(e);
   });
 </script>
-
+-->
 </body>
 </html>

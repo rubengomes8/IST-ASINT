@@ -20,13 +20,13 @@
     </ul>
 
  
-    <form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('id').innerHTML + document.getElementById('f2').value +'?id={{key}}' ; return false">
+    <form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('id').innerHTML + document.getElementById('f2').value; return false">
         <input type="submit" value="Location">
         <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
         <input type=hidden id=f2 name=f1 value="/location">
     </form>
     
-    <form style="margin-top: 0.5cm;" action="#"   onsubmit="location.href = document.getElementById('f3').value +   document.getElementById('id').innerHTML + document.getElementById('f4').value+ '?id={{key}}' ; return false">
+    <form style="margin-top: 0.5cm;" action="#"   onsubmit="location.href = document.getElementById('f3').value +   document.getElementById('id').innerHTML + document.getElementById('f4').value; return false">
             <input type="submit" value="Timetable">
             <input type=hidden id=f3 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
             <input type=hidden id=f4 name=f1 value="/events">
