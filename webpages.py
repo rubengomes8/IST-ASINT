@@ -4,7 +4,6 @@ from flask import jsonify
 from flask import redirect
 import requests
 from flask import request
-import auth
 import datetime
 import uuid
 
@@ -13,7 +12,13 @@ app = Flask(__name__)
 port_api='3998'
 port_webpages='3998'
 log_path='./log.txt'
-port_log='4003'
+
+services = {
+    'secretariats': "http://127.0.0.1:4000",
+    'canteen': "http://127.0.0.1:4001",
+    'room': "http://127.0.0.1:4002",
+    'logs': "http://127.0.0.1:4003"
+}
 port_sec = '4000'
 port_canteen = '4001'
 port_rooms = '4002'
@@ -44,10 +49,26 @@ def login():
 
 @app.route('/api/<path:subpath>', methods=['GET', 'POST'])
 def api(subpath):
-    print("asdfsaesrdgtedw:", subpath)
+    global services
+    print("subpath:", subpath)
     words = subpath.split('/')
     microservice = words[0]
-    if microservice == 'secretariats':
+    try:
+        url = services[str(microservice)] + '/api/' + subpath
+        print(url)
+    except:
+        return {'msg': 'Not Found'}
+
+    if request.method == 'GET':
+        return jsonify(requests.get(url=url).json())
+    elif request.method == 'POST':
+        print(url)
+
+        data = request.form
+        print(data)
+        return jsonify(requests.post(url=url, data=data).json())
+
+    '''if microservice == 'secretariats':
         port = port_sec
     elif microservice == 'canteen':
         port = port_canteen
@@ -57,16 +78,7 @@ def api(subpath):
         port = port_log
     else:
         return {'msg': 'Not Found'}
-
-    url = 'http://127.0.0.1:' + port + '/api/' + subpath
-    if request.method == 'GET':
-        return jsonify(requests.get(url=url).json())
-    elif request.method == 'POST':
-        print(url)
-
-        data = request.form
-        print(data)
-        return jsonify(requests.post(url=url, data=data).json())
+    url = 'http://127.0.0.1:' + port + '/api/' + subpath'''
 
 @app.route('/users', methods=['GET'])
 def show_users_dict():
