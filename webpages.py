@@ -84,7 +84,7 @@ def api(subpath):
 def show_users_dict():
     return jsonify(users_dict)
 
-@app.route('/admin', methods=['POST'])
+@app.route('/admin', methods=['POST', 'GET'])
 def admin():
     global adminToken
     global admin_username
@@ -221,9 +221,11 @@ def get_logs():
             send_log('backend: webpages, render logs, GET')
             url = 'http://127.0.0.1:' + port_api + '/api/logs/getlogs'
             print(url)
-            return jsonify(requests.get(url=url).json())
+            #return jsonify(requests.get(url=url).json())
+            return render_template("showLogs.html", msg=requests.get(url=url).json(),key=str(adminToken))
         else:
-            return jsonify({"error": "you do not have permission"})
+            #return jsonify({"error": "you do not have permission"})
+            return render_template("showLogs.html", msg=["error : you do not have permission"])
     else:
         return redirect('/private')
     #except:
@@ -238,7 +240,7 @@ def create_sec_form():
                 send_log('backend: webpages, render add secretariat form, GET')
                 return render_template("addSecretariatForm.html", key=request.args['id'])
             else:
-                return jsonify({"error": "you do not have permission"})
+                return render_template("resultAdmin.html", msg=["error : you do not have permission"])
         else:
             return redirect('/private')
     except:
@@ -259,7 +261,8 @@ def add_secretariat():
                 'description': str(request.form['Description'])
             }
             r = requests.post(url=url, data=data)
-            return jsonify(r.json())
+            #return jsonify(r.json())
+            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" added"])
         else:
             return redirect('/private')
     except:
@@ -274,7 +277,7 @@ def edit_sec_form():
                 send_log('backend: webpages, render edit secretariat form, GET')
                 return render_template("editSecretariatForm.html", key=request.args['id'])
             else:
-                return jsonify({"error": "you do not have permission"})
+                return render_template("resultAdmin.html", msg=["error : you do not have permission"])
         else:
             return redirect('/private')
     except:
@@ -295,7 +298,8 @@ def edit_secretariat():
             'description': str(request.form['Description'])
         }
         r = requests.post(url=url, data=data)
-        return jsonify(r.json())
+        #return jsonify(r.json())
+        return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" edited"])
     else:
         return redirect('/private')
 
