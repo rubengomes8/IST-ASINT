@@ -14,40 +14,12 @@
 
 
 <h1>Search Place</h1>
-<!--
-<form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value +'?id={{key}}'; return false">
-    ID:<input type="text" id="q" name="f2">
-    <input type="submit" value="go">
-    <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
-</form>
--->
-<!--
-<video id="preview"></video>
-<p id="QRcode"></p>-->
+
 <form action="#"   onsubmit="location.href = document.getElementById('f1').value +   document.getElementById('q').value; return false" >
     ID:<input type="text" id="q" name="f2">
     <input type="submit" value="go">
     <input type=hidden id=f1 name=f1 value="http://127.0.0.1:{{port_webpages}}/rooms/">
 </form>
 
-<!--
-<script type="text/javascript">
-  let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-  scanner.addListener('scan', function (content) {
-   
-    //document.getElementById("q").value = content;
-    document.getElementById("q").value = content;
-  });
-  Instascan.Camera.getCameras().then(function (cameras) {
-    if (cameras.length > 0) {
-      scanner.start(cameras[0]);
-    } else {
-      console.error('No cameras found.');
-    }
-  }).catch(function (e) {
-    console.error(e);
-  });
-</script>
--->
 </body>
 </html>

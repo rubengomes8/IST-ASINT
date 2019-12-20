@@ -16,20 +16,6 @@
     function reqResponse () {
             console.log(this.responseText);
             document.getElementById("info").innerHTML =this.responseText;
-           /*
-         o = JSON.parse(this.responseText);
-                       console.log(o[10]);
-        s="<ol>";
-        var i =0;
-        var len = o.length
-        for (i = 0, len = o.length; i < len; i++) {
-            s+= "<li>";
-            s += o[i];
-            s+= "</li>";
-        }
-        s+="</ol>";
-        document.getElementById('divDestiny').innerHTML = s;
-        */
     }
 
 
@@ -48,15 +34,6 @@
         oReq.setRequestHeader("Content-type", "application/json");
         oReq.send()
 
-        /*
-        console.log(this.responseText);
-        document.getElementById('divDestiny').innerHTML = t;
-        var oReq = new XMLHttpRequest();
-        oReq.addEventListener("load", reqResponse);
-        oReq.open("POST", "/autocomplete");
-        oReq.setRequestHeader("Content-type", "application/json");
-        oReq.send('{"str":"'+  t + '"}');
-        */
     }
     //]]>
 </script>
@@ -72,9 +49,6 @@
 <script type="text/javascript">
   let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
   scanner.addListener('scan', function (content) {
-
-    //document.getElementById("q").value = content;
-    //document.getElementById("q").value = content;
     autocomplete_f(content)
   });
   Instascan.Camera.getCameras().then(function (cameras) {

@@ -10,7 +10,6 @@ endpoints:
 
 from flask import Flask
 from flask import jsonify
-from flask import render_template
 from flask import request
 import requests
 import datetime
@@ -74,17 +73,11 @@ def show_location(_id):
                 room['name']=data['name']
                 room['description']=data['description']
                 room['capacity']=data['capacity']
-                parent_space=data['parentSpace'] 
-                
-                print(parent_space) 
+                parent_space=data['parentSpace']
                 id_parent=parent_space['id']
-                print(id_parent)
-                data_parent={}
-
                 url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+data['parentSpace']['id']
                 r_parent = requests.get(url = url)
                 data_parent=r_parent.json()                    
-                
 
                 while data_parent['parentSpace']['type'] != "BUILDING":                    
                     url='https://fenix.tecnico.ulisboa.pt/api/fenix/v1/spaces/'+data_parent['parentSpace']['id']

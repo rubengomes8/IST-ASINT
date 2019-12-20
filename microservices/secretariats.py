@@ -7,32 +7,11 @@ import databases.secretariatsDB as secdb
 import requests
 import datetime
 
-'''
-Scretariats: id, name, building, campus, opening hours e description.
-endpoints:
-GET
-- "api/secretariats/<id>" apresenta nome, campus, edificio, horário e descrição
-- "api/secretariats/<id>/location" apresenta nome, campus e edificio
-- "api/secretariats/<id>/description" apresenta nome e descrição
-- "api/secretariats/<id>/hours" apresenta nome, horas
-POST
-- "api/secretariats/create" - cria secretaria, tem que ser admin
-- "api/secretariats/<id>/hours" - modificar as horas de abertura, tem que ser admin
-- "api/secretariats/<id>/description" - modificar descrição, tem que ser admin
-- "api/secretariats/<id>/name" - modificar nome, tem que ser admin 
-'''
-
 app = Flask(__name__)
 db = secdb.secretariatsDB("secretariats")
 
 port_log='4003'
 
-'''
-@app.route('/api/secretariats')
-def hello_world():
-    count = len(db.listAllSecretariats())
-    return render_template("secretariatsMenu.html", count=count)'''
-    
 @app.route('/api/secretariats/', methods=['GET'])
 def list_all_Secretariats():
     if request.method == "GET":
@@ -44,7 +23,6 @@ def list_all_Secretariats():
             list_of_dicts.append(item.__dict__)
         return jsonify(list_of_dicts)
 
-##usar apenas no backend
 @app.route('/api/secretariats/create')
 def create_sec_form():
     if request.method == "GET":
@@ -126,8 +104,6 @@ def secretariat_timetable(_id):
             dict_['error']=404
             return jsonify(dict_)   
     return jsonify(sec)
-
-
 
 
 def send_log(msg):

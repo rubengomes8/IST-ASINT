@@ -102,7 +102,7 @@ def getuser():
                 return jsonify({'name': user[2], 'photo': user[3]['data']}) #only istid
         return jsonify({'name': 'user not found', 'photo': 'user not found'})
     else:
-        return "XXXX"
+        return "is not json"
 
 @app.route('/clean', methods=['POST'])
 def clean():
@@ -133,7 +133,6 @@ def userAuthenticated():
         resp = requests.get("https://fenix.tecnico.ulisboa.pt/api/fenix/v1/person", params = params)
         r_info = resp.json()
         print(r_info)
-        # precisamos de guardar o nome e foto
         key = str(uuid.uuid1())
         global users_dict
         global secret
