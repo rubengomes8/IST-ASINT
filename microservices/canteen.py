@@ -15,7 +15,6 @@ endpoints:
 '''
 app = Flask(__name__)
 cache = {}  # key: day value: json food
-log_path = './log.txt'
 port_log='4003'
 
 @app.route('/api/canteen', methods=['GET'])

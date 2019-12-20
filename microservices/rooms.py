@@ -16,7 +16,6 @@ import requests
 import datetime
 
 app = Flask(__name__)
-log_path = './log.txt'
 
 port_log='4003'
 

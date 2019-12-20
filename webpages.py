@@ -11,7 +11,6 @@ app = Flask(__name__)
 
 port_api='3998'
 port_webpages='3998'
-log_path='./log.txt'
 
 services = {
     'secretariats': "http://127.0.0.1:4000",
@@ -19,6 +18,7 @@ services = {
     'room': "http://127.0.0.1:4002",
     'logs': "http://127.0.0.1:4003"
 }
+
 port_sec = '4000'
 port_canteen = '4001'
 port_rooms = '4002'
@@ -68,18 +68,6 @@ def api(subpath):
         print(data)
         return jsonify(requests.post(url=url, data=data).json())
 
-    '''if microservice == 'secretariats':
-        port = port_sec
-    elif microservice == 'canteen':
-        port = port_canteen
-    elif microservice == 'room':
-        port = port_rooms
-    elif microservice == 'logs':
-        port = port_log
-    else:
-        return {'msg': 'Not Found'}
-    url = 'http://127.0.0.1:' + port + '/api/' + subpath'''
-
 @app.route('/users', methods=['GET'])
 def show_users_dict():
     return jsonify(users_dict)
@@ -92,7 +80,9 @@ def admin():
     if str(request.form['username'])  == admin_username and str(request.form['password']) == admin_password:
         adminToken = str(uuid.uuid1())
         users_dict[str(adminToken)] = ("admin", str(adminToken))
-        return render_template("mainPage.html", key=str(adminToken))
+        return render_template("adminPage.html", key=str(adminToken))
+    else:
+        return render_template("Login.html")
 
 @app.route('/getgetusersdict', methods=['POST'])
 def get_getusersdict():
@@ -150,7 +140,7 @@ def userAuthenticated():
         # 0 - username, 1 - token, 2 - name, 3 - photo, 4 - secret, 5 - name_friend, 6 - photo_friend
         users_dict[str(key)] = (r_info['username'], r_token['access_token'], r_info['name'], r_info['photo'], str(secret), "", {}) # photo é um dict com {'type': 'image/png', 'data': 'sdsdsds'}
         secret += 1
-        get_users_dict[secret] = ("", {})
+        get_users_dict[int(secret)] = ("", {})
         send_log('backend: webpages, render services options, GET')
         return render_template("mainPage.html", key=str(key))
     else:
@@ -218,18 +208,15 @@ def get_logs():
     #try:
     if str(request.args['id']) in users_dict:
         if str(request.args['id']) == adminToken:
-            send_log('backend: webpages, render logs, GET')
+            send_log('backend: admin, render logs, GET')
             url = 'http://127.0.0.1:' + port_api + '/api/logs/getlogs'
             print(url)
-            #return jsonify(requests.get(url=url).json())
             return render_template("showLogs.html", msg=requests.get(url=url).json(),key=str(adminToken))
         else:
-            #return jsonify({"error": "you do not have permission"})
             return render_template("showLogs.html", msg=["error : you do not have permission"])
     else:
-        return redirect('/private')
-    #except:
-        #return redirect('/private')
+        return redirect('/')
+
 
 @app.route('/secretariats/create',methods=['GET'])
 def create_sec_form():
@@ -237,22 +224,65 @@ def create_sec_form():
     try:
         if str(request.args['id']) in users_dict:
             if str(request.args['id']) == adminToken:
-                send_log('backend: webpages, render add secretariat form, GET')
+                send_log('backend: admin, render add secretariat form, GET')
                 return render_template("addSecretariatForm.html", key=request.args['id'])
             else:
                 return render_template("resultAdmin.html", msg=["error : you do not have permission"])
         else:
-            return redirect('/private')
+            return redirect('/')
     except:
-        return redirect('/private')
+        return redirect('/')
 
 @app.route('/secretariats/addSecretariat', methods=['POST'])
 def add_secretariat():
     global users_dict
     try:
         if str(request.args['id']) in users_dict:
-            send_log('backend: webpages,  add secretariat, POST')
-            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/addSecretariat'
+            if str(request.args['id']) == adminToken:
+                send_log('backend: admin,  add secretariat, POST')
+                url = 'http://127.0.0.1:' + port_api + '/api/secretariats/addSecretariat'
+                data = {
+                    'name': str(request.form['Name']),
+                    'campus': str(request.form['Campus']),
+                    'building': str(request.form['Building']),
+                    'hours': str(request.form['Hours']),
+                    'description': str(request.form['Description'])
+                }
+                r = requests.post(url=url, data=data)
+                if 'error' in r.json():
+                    return render_template("resultAdmin.html", key=request.args['id'], msg=["Secretariat was not added."])
+                else:
+                    return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" added"])
+            else:
+                return render_template("resultAdmin.html", msg=["error : you do not have permission"])
+        else:
+            return redirect('/')
+    except:
+        return redirect('/')
+
+@app.route('/secretariats/edit', methods=['GET'])
+def edit_sec_form():
+    global users_dict
+    try:
+        if str(request.args['id']) in users_dict:
+            if str(request.args['id']) == adminToken:
+                send_log('backend: admin, render edit secretariat form, GET')
+                return render_template("editSecretariatForm.html", key=request.args['id'])
+            else:
+                return render_template("resultAdmin.html", msg=["error : you do not have permission"])
+        else:
+            return redirect('/')
+    except:
+        return redirect('/')
+
+
+@app.route('/secretariats/editSecretariat', methods=['POST'])
+def edit_secretariat():
+    global users_dict
+    if str(request.args['id']) in users_dict:
+        if str(request.args['id']) == adminToken:
+            send_log('backend: admin, edit secretariat, POST')
+            url = 'http://127.0.0.1:' + port_api + '/api/secretariats/editSecretariat'
             data = {
                 'name': str(request.form['Name']),
                 'campus': str(request.form['Campus']),
@@ -261,50 +291,48 @@ def add_secretariat():
                 'description': str(request.form['Description'])
             }
             r = requests.post(url=url, data=data)
+            if 'error' in r.json():
+                return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  " + data['name'] + " does not exist."])
+            else:
             #return jsonify(r.json())
-            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" added"])
+                return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" edited"])
         else:
-            return redirect('/private')
-    except:
-        return redirect('/private')
+            return render_template("resultAdmin.html", msg=["error : you do not have permission"])
+    else:
+        return redirect('/')
 
-@app.route('/secretariats/edit', methods=['GET'])
-def edit_sec_form():
+
+@app.route('/secretariats/createservice', methods=['GET'])
+def create_service_form():
     global users_dict
     try:
         if str(request.args['id']) in users_dict:
             if str(request.args['id']) == adminToken:
-                send_log('backend: webpages, render edit secretariat form, GET')
-                return render_template("editSecretariatForm.html", key=request.args['id'])
+                send_log('backend: admin, render create service form, GET')
+                return render_template("serviceForm.html", key=request.args['id'])
             else:
                 return render_template("resultAdmin.html", msg=["error : you do not have permission"])
         else:
-            return redirect('/private')
+            return redirect('/')
     except:
-        return redirect('/private')
+        return redirect('/')
 
 
-@app.route('/secretariats/editSecretariat', methods=['POST'])
-def edit_secretariat():
-    global users_dict
+
+@app.route('/secretariats/service', methods=['POST'])
+def service():
+    global services
     if str(request.args['id']) in users_dict:
-        send_log('backend: webpages, edit secretariat, POST')
-        url = 'http://127.0.0.1:' + port_api + '/api/secretariats/editSecretariat'
-        data = {
-            'name': str(request.form['Name']),
-            'campus': str(request.form['Campus']),
-            'building': str(request.form['Building']),
-            'hours': str(request.form['Hours']),
-            'description': str(request.form['Description'])
-        }
-        r = requests.post(url=url, data=data)
-        if 'error' in r.json():
-            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  " + data['name'] + " does not exist."])
+        if str(request.args['id']) == adminToken:
+            send_log('backend: admin, create service, POST')
+            ip = str(request.form['ip'])
+            name = str(request.form['Name'])
+            services[name] = ip
+            return render_template("resultAdmin.html", msg=["Microservice added."])
         else:
-        #return jsonify(r.json())
-            return render_template("resultAdmin.html", key=request.args['id'], msg=["secretariat  "+data['name']+" edited"])
+            return render_template("resultAdmin.html", msg=["error : you do not have permission"])
     else:
-        return redirect('/private')
+        return redirect('/')
 
 # CANTINA
 @app.route('/canteen', methods=['GET'])
